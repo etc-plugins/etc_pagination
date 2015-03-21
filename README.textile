@@ -42,11 +42,11 @@ h4. Attributes
 * @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
 * @mask="value"@<br />If set, the whole output will be constructed by replacing the patterns @{links}@, @{first}@, @{last}@, @{prev}@, @{next}@, @{<+}@ (gap before) and @{+>}@ (gap after) by corresponding strings. Default: unset.
 * @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
-* @html_id@<br />TODO
-* @class@<br />TODO
-* @wraptag@<br />TODO
-* @break@<br />TODO
-* @atts@<br />TODO
+* @html_id="id"@<br />The HTML @id@ attribute assigned to the @wraptag@ attribute value.
+* @class="class name"@<br />HTML @class@ to apply to the @wraptag@ attribute value.
+* @wraptag="element"@<br />HTML element to wrap (markup) block, specified without brackets (e.g., @wraptag="ul"@).
+* @break="value"@<br />Where value is an HTML element, specified without brackets (e.g., @break="li"@) to separate list items.
+* @atts="value"@<br />Additional attributes to apply to the @wraptag@ attribute value.
 
 h4. Replacements
 
