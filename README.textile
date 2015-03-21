@@ -26,27 +26,27 @@ TODO
 
 h4. Attributes
 
-* @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
+* @atts="value"@<br />Additional attributes to apply to the @wraptag@ attribute value.
+* @break="value"@<br />Where value is an HTML element, specified without brackets (e.g., @break="li"@) to separate list items.
+* @class="class name"@<br />HTML @class@ to apply to the @wraptag@ attribute value.
+* @current="text"@<br />A text active on the current tab.
+* @delimiter="value"@<br />A string to use as delimiter in @general,current@ link pairs, see below. Default: @,@ (a comma).
+* @first="text"@<br />Enables you to alter the text inside the 'first' link.
+* @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
+* @html_id="id"@<br />The HTML @id@ attribute assigned to the @wraptag@ attribute value.
+* @last="text"@<br />Enables you to alter the text inside the 'last' link.
+* @link="text"@<br />Enables you to alter the text in the titles of the page tabs. If two *delimiter*-separated strings are given, then the first one will be used on @general@ pages, and the second one on the @current@ page. Default: @{*}@, where @{*}@ will be replaced by appropriate tab numbers, see 'Replacements' section below.
+* @mask="value"@<br />If set, the whole output will be constructed by replacing the patterns @{links}@, @{first}@, @{last}@, @{prev}@, @{next}@, @{<+}@ (gap before) and @{+>}@ (gap after) by corresponding strings. Default: unset.
+* @next="text"@<br />Enables you to alter the text inside the 'next' link.
+* @offset="number"@<br />Page number offset. Default: @0@.
+* @page="number"@<br />An integer to be considered as @default@ page (typically @1@).
 * @pages="value"@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
 * @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
-* @page="number"@<br />An integer to be considered as @default@ page (typically @1@).
-* @offset="number"@<br />Page number offset. Default: @0@.
-* @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
-* @delimiter="value"@<br />A string to use as delimiter in @general,current@ link pairs, see below. Default: @,@ (a comma).
-* @link="text"@<br />Enables you to alter the text in the titles of the page tabs. If two *delimiter*-separated strings are given, then the first one will be used on @general@ pages, and the second one on the @current@ page. Default: @{*}@, where @{*}@ will be replaced by appropriate tab numbers, see 'Replacements' section below.
-* @current="text"@<br />A text active on the current tab.
-* @first="text"@<br />Enables you to alter the text inside the 'first' link.
 * @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
-* @next="text"@<br />Enables you to alter the text inside the 'next' link.
-* @last="text"@<br />Enables you to alter the text inside the 'last' link.
-* @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
-* @mask="value"@<br />If set, the whole output will be constructed by replacing the patterns @{links}@, @{first}@, @{last}@, @{prev}@, @{next}@, @{<+}@ (gap before) and @{+>}@ (gap after) by corresponding strings. Default: unset.
+* @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
 * @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
-* @html_id="id"@<br />The HTML @id@ attribute assigned to the @wraptag@ attribute value.
-* @class="class name"@<br />HTML @class@ to apply to the @wraptag@ attribute value.
+* @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
 * @wraptag="element"@<br />HTML element to wrap (markup) block, specified without brackets (e.g., @wraptag="ul"@).
-* @break="value"@<br />Where value is an HTML element, specified without brackets (e.g., @break="li"@) to separate list items.
-* @atts="value"@<br />Additional attributes to apply to the @wraptag@ attribute value.
 
 h4. Replacements
 
@@ -54,11 +54,11 @@ If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as c
 
 * @{#}@<br />The page number.
 * @{*}@<br />The page title.
-* @{pages}@<br />The total pages number.
-* @{href}@<br />The page URL.
-* @{rel}@<br />The page relation (@next@, @prev@).
 * @{current}@<br />The text given by @current@ attribute, enabled only on the current tab.
+* @{href}@<br />The page URL.
 * @{link}@<br />The text given by @link@ attribute, replaced by @first@, @prev@, etc when necessary.
+* @{pages}@<br />The total pages number.
+* @{rel}@<br />The page relation (@next@, @prev@).
 
 For example, the following will generate a <code>select</code> pagination list:
 
