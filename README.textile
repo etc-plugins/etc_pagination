@@ -4,6 +4,101 @@ This Textpattern plugin creates a paginated navigation bar similar to those seen
 
 Please report bugs and problems with this plugin at "the GitHub project's issues page":https://github.com/bloatware/etc-pagination/issues.
 
+p(alert-block information). Note that this plugin creates a list that is meant to be <em>styled by you</em>, through <abbr title="Cascading Style Sheets">>CSS</abbr>.
+
+h2. Installation, upgrading and uninstallation
+
+Download the latest version of the plugin from "the GitHub project page":https://github.com/bloatware/etc-pagination/releases, paste the code into the Textpattern Admin → Plugins panel, install and enable the plugin. Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
+
+To uninstall, delete from the Admin → Plugins panel.
+
+h2. Usage
+
+TODO
+
+h2. Tags
+
+h3. txp:etc_pagination
+
+bc. <txp:etc_pagination />
+
+TODO
+
+h4. Attributes
+
+* @root@<br />The URL to be used as base for navigation, defaults to the current page URL.
+* @pages@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
+* @pgcounter@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
+* @page@<br />An integer to be considered as @default@ page (typically @1@).
+* @offset<br />Page number offset. Default: @0@.
+* @range@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
+* @delimiter@<br />A string to use as delimiter in @general,current@ link pairs, see below. Default: @,@ (a comma).
+* @link@<br />Enables you to alter the text in the titles of the page tabs. If two *delimiter*-separated strings are given, then the first one will be used on @general@ pages, and the second one on the @current@ page. Default: @{*}@, where @{*}@ will be replaced by appropriate tab numbers, see 'Replacements' section below.
+* @current@<br />A text active on the current tab.
+* @first@<br />Enables you to alter the text inside the 'first' link.
+* @prev@<br />Enables you to alter the text inside the 'previous' link.
+* @next@<br />Enables you to alter the text inside the 'next' link.
+* @last@<br />Enables you to alter the text inside the 'last' link.
+* @gap@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
+* @mask@<br />If set, the whole output will be constructed by replacing the patterns @{links}@, @{first}@, @{last}@, @{prev}@, @{next}@ and @{<+},{+>}@ (gap before, gap after) by corresponding strings. Default: unset.
+* @reversenumberorder@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
+* @html_id@<br />TODO
+* @class@<br />TODO
+* @wraptag@<br />TODO
+* @break@<br />TODO
+* @atts@<br />TODO
+
+h4. Replacements
+
+If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as container to construct your own links. The following replacement tokens are available inside @etc_pagination@:
+
+* @{#}@<br />The page number.
+* @{*}@<br />The page title.
+* @{pages}@<br />The total pages number.
+* @{href}@<br />The page URL.
+* @{rel}@<br />The page relation (@next@, @prev@).
+* @{current}@<br />The text given by @current@ attribute, enabled only on the current tab.
+* @{link}@<br />The text given by @link@ attribute, replaced by @first@, @prev@, etc when necessary.
+
+For example, the following will generate a <code>select</code> pagination list:
+
+bc. <txp:etc_pagination link="Page {*}" current="selected"
+    wraptag="select" atts="name='pg'">
+    <option value='{*}' {current}>{link}</option>
+</txp:etc_pagination>
+
+h4. Examples
+
+h5. Example 1
+
+bc. <txp:etc_pagination range="2" prev="Previous" next="Next"  wraptag="ul" break="li" />
+
+This outputs if there are ten pages and we are on the third one, like so:
+
+bc. <ul>
+    <li><a href="...&pg=1" rel="prev">Previous</a></li>
+    <li><a href="...&pg=1">1</a></li>
+    <li><a href="...&pg=2">2</a></li>
+    <li><span data-rel="current">3</span></li>
+    <li><span data-rel="gap">&hellip;</span></li>
+    <li><a href="...&pg=10" rel="last">10</a></li>
+    <li><a href="...&pg=5" rel="next">Next</a></li>
+</ul>
+
+The @<a>@ and @<span>@ tags linking to @first@, @prev@, @current@, @next@, @last@, @gap@ pages, will be given the corresponding value of @rel@ or @data-rel@ attributes.
+
+h5. Example 2
+
+bc. <txp:etc_pagination range="0">
+    <p>Page {*} of {pages}</p>
+</txp:etc_pagination>
+
+This outputs if there are ten pages and we are on the third one, like so:
+
+bc. <p>Page 3 of 10</p>
+
+h5. Example 3
+
 TODO
 
 h2. History
