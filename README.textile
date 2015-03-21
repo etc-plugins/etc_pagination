@@ -1,5 +1,7 @@
 h1. etc_pagination
 
+This Textpattern plugin creates a paginated navigation bar similar to those seen on Google when you search for something. It has a wide variety of attributes - so you are able to customise it until you drop! It can be used alone for @<txp:article />@ and @<txp:article_custom />@ pagination, but it also has the ability to paginate any list, with a little help of "etc_query":http://www.iut-fbleau.fr/projet/etc/index.php?id=3.
+
 Please report bugs and problems with this plugin at "the GitHub project's issues page":https://github.com/bloatware/etc-pagination/issues.
 
 TODO
