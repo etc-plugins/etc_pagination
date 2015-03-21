@@ -1,5 +1,7 @@
 h1. etc_pagination
 
+Please report bugs and problems with this plugin at "the GitHub project's issues page":https://github.com/bloatware/etc-pagination/issues.
+
 TODO
 
 h2. History
@@ -8,4 +10,4 @@ Please see the "changelog on GitHub":https://github.com/bloatware/etc-pagination
 
 h2. Authors/credits
 
-TODO
+Written by "Oleg Loukianov":http://www.iut-fbleau.fr/projet/etc/. Many thanks to "all additional contributors":https://github.com/bloatware/etc-pagination/graphs/contributors.
