@@ -1,0 +1,11 @@
+h1. etc_pagination
+
+TODO
+
+h2. History
+
+Please see the "changelog on GitHub":https://github.com/bloatware/etc-pagination/blob/master/CHANGELOG.textile.
+
+h2. Authors/credits
+
+TODO
