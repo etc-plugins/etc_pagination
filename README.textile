@@ -26,22 +26,22 @@ TODO
 
 h4. Attributes
 
-* @root@<br />The URL to be used as base for navigation, defaults to the current page URL.
-* @pages@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
-* @pgcounter@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
-* @page@<br />An integer to be considered as @default@ page (typically @1@).
-* @offset@<br />Page number offset. Default: @0@.
-* @range@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
-* @delimiter@<br />A string to use as delimiter in @general,current@ link pairs, see below. Default: @,@ (a comma).
-* @link@<br />Enables you to alter the text in the titles of the page tabs. If two *delimiter*-separated strings are given, then the first one will be used on @general@ pages, and the second one on the @current@ page. Default: @{*}@, where @{*}@ will be replaced by appropriate tab numbers, see 'Replacements' section below.
-* @current@<br />A text active on the current tab.
-* @first@<br />Enables you to alter the text inside the 'first' link.
-* @prev@<br />Enables you to alter the text inside the 'previous' link.
-* @next@<br />Enables you to alter the text inside the 'next' link.
-* @last@<br />Enables you to alter the text inside the 'last' link.
-* @gap@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
-* @mask@<br />If set, the whole output will be constructed by replacing the patterns @{links}@, @{first}@, @{last}@, @{prev}@, @{next}@, @{<+}@ (gap before) and @{+>}@ (gap after) by corresponding strings. Default: unset.
-* @reversenumberorder@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
+* @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
+* @pages="value"@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
+* @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
+* @page="number"@<br />An integer to be considered as @default@ page (typically @1@).
+* @offset="number"@<br />Page number offset. Default: @0@.
+* @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
+* @delimiter="value"@<br />A string to use as delimiter in @general,current@ link pairs, see below. Default: @,@ (a comma).
+* @link="text"@<br />Enables you to alter the text in the titles of the page tabs. If two *delimiter*-separated strings are given, then the first one will be used on @general@ pages, and the second one on the @current@ page. Default: @{*}@, where @{*}@ will be replaced by appropriate tab numbers, see 'Replacements' section below.
+* @current="text"@<br />A text active on the current tab.
+* @first="text"@<br />Enables you to alter the text inside the 'first' link.
+* @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
+* @next="text"@<br />Enables you to alter the text inside the 'next' link.
+* @last="text"@<br />Enables you to alter the text inside the 'last' link.
+* @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
+* @mask="value"@<br />If set, the whole output will be constructed by replacing the patterns @{links}@, @{first}@, @{last}@, @{prev}@, @{next}@, @{<+}@ (gap before) and @{+>}@ (gap after) by corresponding strings. Default: unset.
+* @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
 * @html_id@<br />TODO
 * @class@<br />TODO
 * @wraptag@<br />TODO
