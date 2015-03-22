@@ -494,7 +494,7 @@ bc. <p>Page 6 of 8</p>
 
 h5. Example 3
 
-bc. <txp:etc_pagination wraptag="nav" class="layout--span-1-8 paginator" range="3" atts=' aria-label="Blog navigation"'
+bc. <txp:etc_pagination wraptag="nav" class="paginator" range="3" atts=' aria-label="Blog navigation"'
     prev='<a class="prev" rel="prev" href="http://example.com{href}" title="Go to previous page" aria-label="Go to previous page">Prev</a>,
           <span class="prev disabled" aria-label="This is the first page">Prev</span>'
     next='<a class="next" rel="next" href="http://example.com{href}" title="Go to next page" aria-label="Go to next page">Next</a>,
@@ -510,7 +510,7 @@ bc. <txp:etc_pagination wraptag="nav" class="layout--span-1-8 paginator" range="
 
 Fully customised HTML solutions can be achieved - this example outputs, if there are 11 pages and we are on the fifth one, like so:
 
-bc. <nav class="layout--span-1-8 paginator" aria-label="Blog navigation">
+bc. <nav class="paginator" aria-label="Blog navigation">
     <a class="prev" rel="prev" href="http://example.com/blog/?pg=4" title="Go to previous page" aria-label="Go to previous page">Prev</a>
     <a class="next" rel="next" href="http://example.com/blog/?pg=6" title="Go to next page" aria-label="Go to next page">Next</a>
     <ul class="pagination">
