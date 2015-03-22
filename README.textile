@@ -73,7 +73,7 @@ h5. Example 1
 
 bc. <txp:etc_pagination range="2" prev="Previous" next="Next"  wraptag="ul" break="li" />
 
-This outputs if there are ten pages and we are on the third one, like so:
+This example outputs, if there are ten pages and we are on the third one, like so:
 
 bc. <ul>
     <li>
@@ -107,13 +107,55 @@ bc. <txp:etc_pagination range="0">
     <p>Page {*} of {pages}</p>
 </txp:etc_pagination>
 
-This outputs if there are ten pages and we are on the third one, like so:
+This example outputs, if there are 8 pages and we are on the sixth one, like so:
 
-bc. <p>Page 3 of 10</p>
+bc. <p>Page 6 of 8</p>
 
 h5. Example 3
 
-TODO
+bc. <txp:etc_pagination wraptag="nav" class="layout--span-1-8 paginator" range="3" atts=' aria-label="Blog navigation"'
+    prev='<a class="prev" rel="prev" href="http://example.com{href}" title="Go to previous page" aria-label="Go to previous page">Prev</a>,
+          <span class="prev disabled" aria-label="This is the first page">Prev</span>'
+    next='<a class="next" rel="next" href="http://example.com{href}" title="Go to next page" aria-label="Go to next page">Next</a>,
+          <span class="next disabled" aria-label="This is the last page">Next</span>'
+    link='<li><a href="http://example.com{href}" title="Go to page {*}" aria-label="Go to page {*}">{*}</a></li>,
+          <li class="current"><b title="Current page" aria-label="Current page">{*}</b></li>'
+    gap='<li><span title="More pages" aria-label="More pages">…</span></li>'
+    mask='{prev}{next}
+    <ul class="pagination">
+        {first}{<+}{links}{+>}{last}
+    </ul>'
+    />
+
+Fully customised HTML solutions can be achieved - this example outputs, if there are 11 pages and we are on the fifth one, like so:
+
+bc. <nav class="layout--span-1-8 paginator" aria-label="Blog navigation">
+    <a class="prev" rel="prev" href="http://example.com/blog/?pg=4" title="Go to previous page" aria-label="Go to previous page">Prev</a>
+    <a class="next" rel="next" href="http://example.com/blog/?pg=6" title="Go to next page" aria-label="Go to next page">Next</a>
+    <ul class="pagination">
+        <li>
+            <a href="http://example.com/blog/" title="Go to page 1" aria-label="Go to page 1">1</a>
+        </li>
+        <li>
+            <span title="More pages" aria-label="More pages">…</span>
+        </li>
+        <li>
+            <a href="http://example.com/blog/?pg=4" title="Go to page 4" aria-label="Go to page 4">4</a>
+        </li>
+        <li class="current">
+            <b title="Current page" aria-label="Current page">5</b>
+        </li>
+        <li>
+            <a href="http://example.com/blog/?pg=6" title="Go to page 6" aria-label="Go to page 6">6</a>
+        </li>
+        <li>
+            <span title="More pages" aria-label="More pages">…</span>
+        </li>
+        <li>
+            <a href="http://example.com/blog/?pg=11" title="Go to page 11" aria-label="Go to page 11">11</a>
+        </li>
+    </ul>
+</nav>
 
 h2. History
 
