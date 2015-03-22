@@ -387,7 +387,7 @@ Please report bugs and problems with this plugin at "the GitHub project's issues
 
 p(alert-block information). Note that this plugin creates a list that is meant to be _styled by you_ using CSS.
 
-h2. Installation, upgrading and uninstallation
+h2. Upgrading and uninstallation
 
 Download the latest version of the plugin from "the GitHub project page":https://github.com/bloatware/etc-pagination/releases, paste the code into the Textpattern Admin → Plugins panel, install and enable the plugin. Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
 
