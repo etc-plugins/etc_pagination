@@ -107,7 +107,7 @@ bc. <txp:etc_pagination range="0">
     <p>Page {*} of {pages}</p>
 </txp:etc_pagination>
 
-This example outputs, if there are 8 pages and we are on the sixth one, like so:
+This example outputs, if there are eight pages and we are on the sixth one, like so:
 
 bc. <p>Page 6 of 8</p>
 
@@ -127,7 +127,7 @@ bc. <txp:etc_pagination wraptag="nav" class="paginator" range="3" atts='aria-lab
     </ul>'
     />
 
-Fully customised HTML solutions can be achieved - this example outputs, if there are 11 pages and we are on the fifth one, like so:
+Fully customised HTML solutions can be achieved - this example outputs, if there are eleven pages and we are on the fifth one, like so:
 
 bc. <nav class="paginator" aria-label="Blog navigation">
     <a class="prev" rel="prev" href="http://example.com/blog/?pg=4" title="Go to previous page" aria-label="Go to previous page">Prev</a>
