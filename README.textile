@@ -12,17 +12,19 @@ Download the latest version of the plugin from "the GitHub project page":https:/
 
 To uninstall, delete from the Admin → Plugins panel.
 
-h2. Usage
-
-TODO
-
 h2. Tags
 
 h3. txp:etc_pagination
 
 bc. <txp:etc_pagination />
 
-TODO
+The *etc_pagination* tag is a _single_ or a _container_ tag that renders the pagination widget HTML structure.
+
+If used as a container, it must be specified as an opening and closing pair of tags, like this:
+
+bc. <txp:etc_pagination>
+    ...contained statements...
+</txp:etc_pagination>
 
 h4. Attributes
 
