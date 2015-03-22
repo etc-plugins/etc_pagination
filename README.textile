@@ -85,7 +85,7 @@ Most of *etc_numpages* attributes come from @<txp:article />@ and other Textpatt
 * @limit="10"@<br />The default value of *pageby*, see below.
 * @offset="0"@<br />The number of items to exclude from the beginning of the list.
 * @pageby="number"@<br />The maximum number of items per page.
-* @table="txp_table"<br />A name of txp table from which the list will be extracted. Default: @textpattern@ (articles).
+* @table="txp_table"@<br />A name of txp table from which the list will be extracted. Default: @textpattern@ (articles).
 * @total="number"@<br />An optional list length, if known.
 * @author@, @category@, @excerpted@, @exclude@, @expired@, @id@, @include@, @keywords@, @month@, @realname@, @section@, @status@, @time@<br />have the same meaning as in @<txp:article_custom />@ and other list tags.
 
