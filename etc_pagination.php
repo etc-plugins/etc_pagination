@@ -68,34 +68,34 @@ EOT;
 // End of textpack
 
 if (!defined('txpinterface'))
-        @include_once('zem_tpl.php');
+	@include_once('zem_tpl.php');
 
 # --- BEGIN PLUGIN CODE ---
 function etc_pagination($atts, $thing='') {
 	global $thispage, $pretext;
 
 	extract(lAtts(array(
-		"root"=>null,
-		"pages"=>null,
-		"page"=>null,
-		"pgcounter"=>'pg',
-		"offset"=>0,
-		"range"=>-1,
-		"mask"=>null,
-		"link"=>'{*}',
-		"current"=>'',
-		"next"=>'',
-		"prev"=>'',
-		"first"=>null,
-		"last"=>null,
-		"gap"=>'&hellip;',
-		"delimiter"=>',',
-		"wraptag"=>'',
-		"break"=>'',
-		"class"=>'',
-		"html_id"=>'',
-		"atts"=>'',
-		"reversenumberorder"=>'0'
+		"root"               => null,
+		"pages"              => null,
+		"page"               => null,
+		"pgcounter"          => 'pg',
+		"offset"             => 0,
+		"range"              => -1,
+		"mask"               => null,
+		"link"               => '{*}',
+		"current"            => '',
+		"next"               => '',
+		"prev"               => '',
+		"first"              => null,
+		"last"               => null,
+		"gap"                => '&hellip;',
+		"delimiter"          => ',',
+		"wraptag"            => '',
+		"break"              => '',
+		"class"              => '',
+		"html_id"            => '',
+		"atts"               => '',
+		"reversenumberorder" => '0',
 	),$atts));
 
 	if(!isset($pages)) {
@@ -198,7 +198,7 @@ function etc_pagination($atts, $thing='') {
 		$replacements['{rel}'] = '';
 		$replacements['{link}'] = $mask['{first}'] = strtr(isset($first) ? ($page > 1 ? $first : $first_) : $link, $replacements);
 		if(!$custom && $replacements['{link}']) $outfirst = strtr($thing, $replacements);
-		if($gap1 && $loopStart > 1) 
+		if($gap1 && $loopStart > 1)
 			if($custom) $mask['{<+}'] = $gap1; else $outgap = $gap1;
 	}
 
@@ -229,7 +229,7 @@ function etc_pagination($atts, $thing='') {
 		$replacements['{href}'] = $replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}'];
 		$replacements['{rel}'] = '';
 		$replacements['{link}'] = $mask['{last}'] = strtr(isset($last) ? ($page < $numberOfTabs ? $last : $last_) : $link, $replacements);
-		if($gap2 && $loopEnd < $numberOfTabs) 
+		if($gap2 && $loopEnd < $numberOfTabs)
 			if($custom) $mask['{+>}'] = $gap2; else $outgap = $gap2;
 		if(!$custom && $replacements['{link}']) $outlast = strtr($thing, $replacements);
 	}
@@ -271,24 +271,24 @@ function etc_pagination($atts, $thing='') {
 
 		//getting attributes
 		extract(lAtts(array(
-			'table'         => '',
-			'total'         => null,
-			'limit'         => 10,
-			'pageby'        => '',
-			'category'      => '',
-			'section'       => '',
-			'exclude'       => '',
-			'include'       => '',
-			'excerpted'     => '',
-			'author'        => '',
-			'realname'       => '',
-			'month'         => '',
-			'keywords'      => '',
-			'expired'       => $prefs['publish_expired_articles'],
-			'id'            => '',
-			'time'          => 'past',
-			'status'        => '4',
-			'offset'        => 0
+			'table'     => '',
+			'total'     => null,
+			'limit'     => 10,
+			'pageby'    => '',
+			'category'  => '',
+			'section'   => '',
+			'exclude'   => '',
+			'include'   => '',
+			'excerpted' => '',
+			'author'    => '',
+			'realname'  => '',
+			'month'     => '',
+			'keywords'  => '',
+			'expired'   => $prefs['publish_expired_articles'],
+			'id'        => '',
+			'time'      => 'past',
+			'status'    => '4',
+			'offset'    => 0
 		)+$customlAtts,$atts));
 
 		$pageby = intval(empty($pageby) ? $limit : $pageby);
@@ -356,10 +356,10 @@ function etc_pagination($atts, $thing='') {
 	{
 		//getting attributes
 		extract(lAtts(array(
-			'type'        => '',
-			'pageby'        => '10',
-			'pgcounter'        => 'pg',
-			'offset'        => '0'
+			'type'      => '',
+			'pageby'    => '10',
+			'pgcounter' => 'pg',
+			'offset'    => '0'
 		),$atts));
 
 		global $etc_pagination_total;
