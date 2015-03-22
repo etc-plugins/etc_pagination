@@ -62,12 +62,11 @@ If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as c
 * @{pages}@<br />The total pages number.
 * @{rel}@<br />The page relation (@next@, @prev@).
 
-For example, the following will generate a <code>select</code> pagination list:
+For example, the following (container tag) will generate a @<select>@ pagination list:
 
-bc. <txp:etc_pagination link="Page {*}" current="selected"
-    wraptag="select" atts="name='pg'">
-    <option value='{*}' {current}>{link}</option>
-</txp:etc_pagination>
+bc. <txp:etc_pagination link="Page {*}" current="selected" wraptag="select" atts='name="pg"'>
+    <option value="{*}" {current}>{link}</option>
+</txp:etc_pagination
 
 h4. Examples
 
