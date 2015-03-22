@@ -395,7 +395,7 @@ To uninstall, delete from the Admin → Plugins panel.
 
 h2. Tags
 
-h3. txp:etc_pagination
+h3. txp:etc_pagination tag
 
 bc. <txp:etc_pagination />
 
