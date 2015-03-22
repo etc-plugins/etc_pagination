@@ -99,13 +99,13 @@ This example outputs, if there are ten pages and we are on the third one, like s
 
 bc. <ul>
     <li>
-        <a href="http://example.com/blog/&pg=2" rel="prev">Previous</a>
+        <a href="http://example.com/blog/?pg=2" rel="prev">Previous</a>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=1">1</a>
+        <a href="http://example.com/blog/">1</a>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=2">2</a>
+        <a href="http://example.com/blog/?pg=2">2</a>
     </li>
     <li>
         <span data-rel="current">3</span>
@@ -114,10 +114,10 @@ bc. <ul>
         <span data-rel="gap">…</span>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=10">10</a>
+        <a href="http://example.com/blog/?pg=10">10</a>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=4" rel="next">Next</a>
+        <a href="http://example.com/blog/?pg=4" rel="next">Next</a>
     </li>
 </ul>
 
@@ -185,4 +185,4 @@ Please see the "changelog on GitHub":https://github.com/bloatware/etc-pagination
 
 h2. Authors/credits
 
-Written by "Oleg Loukianov":http://www.iut-fbleau.fr/projet/etc/. Many thanks to "all additional contributors":https://github.com/bloatware/etc-pagination/graphs/contributors.
+Written by "Oleg Loukianov":http://www.iut-fbleau.fr/projet/etc/ and inspired by "ob1_pagination":http://forum.textpattern.com/viewtopic.php?id=3724. Many thanks to "all additional contributors":https://github.com/bloatware/etc-pagination/graphs/contributors.
