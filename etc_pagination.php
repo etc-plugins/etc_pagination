@@ -458,7 +458,7 @@ This example outputs, if there are ten pages and we are on the third one, like s
 
 bc. <ul>
     <li>
-        <a href="http://example.com/blog/&pg=1" rel="prev">Previous</a>
+        <a href="http://example.com/blog/&pg=2" rel="prev">Previous</a>
     </li>
     <li>
         <a href="http://example.com/blog/&pg=1">1</a>
@@ -473,10 +473,10 @@ bc. <ul>
         <span data-rel="gap">…</span>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=10" rel="last">10</a>
+        <a href="http://example.com/blog/&pg=10">10</a>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=5" rel="next">Next</a>
+        <a href="http://example.com/blog/&pg=4" rel="next">Next</a>
     </li>
 </ul>
 
