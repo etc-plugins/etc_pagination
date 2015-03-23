@@ -45,6 +45,7 @@ h4. Attributes
 * @pages="value"@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
 * @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
 * @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
+* @query="a&b=c"@<br />A @&@-separated list of GET parameters to be unset/modified in @root@.
 * @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
 * @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
 * @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
