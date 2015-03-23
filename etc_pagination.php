@@ -115,7 +115,7 @@ function etc_pagination($atts, $thing='') {
     if($range < 0) $range = $numberOfTabs; else $range += 1;
 
     $out = $parts = array();
-    if($root === null) {$hu = strtok($pretext['request_uri'], '?')/*''*/; $parts = $_GET;}
+    if($root === null) {$hu = strtok($pretext['request_uri'], '?'); $parts = $_GET;}
     elseif($root === '') $hu = hu;
     else {
         $hu = strtok($root, '?');
@@ -123,11 +123,11 @@ function etc_pagination($atts, $thing='') {
         if(!empty($qs['query'])) parse_str(str_replace('&amp;', '&', $qs['query']), $parts);
     }
 
-	if($query) foreach(do_list($query, '&') as $qs) {
-		@list($k, $v) = explode('=', $qs, 2);
-		if(isset($v)) $parts[$k] = $v;
-		else unset($parts[$k]);
-	}
+    if($query) foreach(do_list($query, '&') as $qs) {
+        @list($k, $v) = explode('=', $qs, 2);
+        if(isset($v)) $parts[$k] = $v;
+        else unset($parts[$k]);
+    }
 	
     if(isset($page))
         if(!$cpages) $pgdefault = $reversenumberorder ? $numberOfTabs - intval($page) + 1 : intval($page);
