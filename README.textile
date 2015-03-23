@@ -14,7 +14,7 @@ To uninstall, delete from the Admin → Plugins panel.
 
 h2. Tags
 
-h3. txp:etc_pagination tag
+h3. etc_pagination tag
 
 bc. <txp:etc_pagination />
 
@@ -158,7 +158,7 @@ bc. <nav class="paginator" aria-label="Blog navigation">
     </ul>
 </nav>
 
-h3. txp:etc_numpages tag
+h3. etc_numpages tag
 
 bc. <txp:etc_numpages />
 
