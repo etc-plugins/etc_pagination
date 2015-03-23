@@ -76,6 +76,7 @@ function etc_pagination($atts, $thing='') {
 
     extract(lAtts(array(
         "root"               => null,
+        "query"              => null,
         "pages"              => null,
         "page"               => null,
         "pgcounter"          => 'pg',
@@ -114,15 +115,20 @@ function etc_pagination($atts, $thing='') {
     if($range < 0) $range = $numberOfTabs; else $range += 1;
 
     $out = $parts = array();
-//    $hu = '';// $pretext['path_from_root'];
     if($root === null) {$hu = strtok($pretext['request_uri'], '?')/*''*/; $parts = $_GET;}
     elseif($root === '') $hu = hu;
     else {
-        extract(parse_url($root));
-        if(!empty($query)) parse_str(str_replace('&amp;', '&', $query), $parts);
-        $hu = (isset($scheme) ? $scheme.'://' : '') . (isset($host) ? $host : '') . (isset($path) ? $path : '');
+        $hu = strtok($root, '?');
+        $qs = parse_url($root);
+        if(!empty($qs['query'])) parse_str(str_replace('&amp;', '&', $qs['query']), $parts);
     }
 
+	if($query) foreach(do_list($query, '&') as $qs) {
+		@list($k, $v) = explode('=', $qs, 2);
+		if(isset($v)) $parts[$k] = $v;
+		else unset($parts[$k]);
+	}
+	
     if(isset($page))
         if(!$cpages) $pgdefault = $reversenumberorder ? $numberOfTabs - intval($page) + 1 : intval($page);
         else for($pgdefault = $numberOfTabs; $pgdefault > 1 && strpos($pages[$pgdefault-1].'::', $page.'::') !== 0; $pgdefault--);
@@ -426,6 +432,7 @@ h4. Attributes
 * @pages="value"@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
 * @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
 * @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
+* @query="a&b=c"@<br />A @&@-separated list of GET parameters to be unset/modified in @root@.
 * @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
 * @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
 * @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
