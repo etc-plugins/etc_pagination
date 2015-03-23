@@ -68,27 +68,6 @@ bc. <txp:etc_pagination link="Page {*}" current="selected" wraptag="select" atts
     <option value="{*}" {current}>{link}</option>
 </txp:etc_pagination
 
-h3. txp:etc_numpages tag
-
-bc. <txp:etc_numpages />
-
-The *etc_numpages* tag is a _single_ helper tag that counts the number of pages in various lists (articles, images, links, ...).
-
-Is typically used as *pages* attribute value passed to *etc_pagination*, like this:
-
-bc. <txp:etc_pagination pages='<txp:numpages section="example" />' />
-
-h4. Attributes
-
-Most of *etc_numpages* attributes come from @<txp:article />@ and other Textpattern list tags.
-
-* @limit="10"@<br />The default value of *pageby*, see below.
-* @offset="0"@<br />The number of items to exclude from the beginning of the list.
-* @pageby="number"@<br />The maximum number of items per page.
-* @table="txp_table"@<br />A name of txp table from which the list will be extracted. Default: @textpattern@ (articles).
-* @total="number"@<br />An optional list length, if known.
-* @author@, @category@, @excerpted@, @exclude@, @expired@, @id@, @include@, @keywords@, @month@, @realname@, @section@, @status@, @time@<br />have the same meaning as in @<txp:article_custom />@ and other list tags.
-
 h4. Examples
 
 h5. Example 1
@@ -178,6 +157,37 @@ bc. <nav class="paginator" aria-label="Blog navigation">
         </li>
     </ul>
 </nav>
+
+h3. txp:etc_numpages tag
+
+bc. <txp:etc_numpages />
+
+The *etc_numpages* tag is a _single_ helper tag that counts the number of pages in various lists (articles, images, links, ...).
+
+This tag is typically used as a *pages* attribute value, passed to *etc_pagination*, like this:
+
+bc. <txp:etc_pagination pages='<txp:numpages section="example" />' />
+
+h4. Attributes
+
+Most attributes come from @<txp:article />@ and other Textpattern list tags:
+
+* @limit="10"@<br />The default value of *pageby*, see below.
+* @offset="0"@<br />The number of items to exclude from the beginning of the list.
+* @pageby="number"@<br />The maximum number of items per page.
+* @table="txp_table"@<br />A name of Textpattern database table from which the list will be extracted. Default: @textpattern@ (articles).
+* @total="number"@<br />An optional list length, if known.
+* @author@, @category@, @excerpted@, @exclude@, @expired@, @id@, @include@, @keywords@, @month@, @realname@, @section@, @status@, @time@<br />These attributes have the same function as in "txp:article_custom":http://www.textpattern.net/wiki/index.php?title=article_custom and other "list tags":http://www.textpattern.net/wiki/index.php?title=Category:List_Tags.
+
+h4. Examples
+
+h5. Example 1
+
+bc. <txp:if_individual_article>
+    <txp:etc_pagination pgcounter="page" pages='<txp:etc_numpages section="news" />' />
+</txp:if_individual_article>
+
+This example shows pagination on individual article pages within the @news@ section (i.e., *not* on an article list context page).
 
 h2. History
 
