@@ -118,8 +118,9 @@ function etc_pagination($atts, $thing='') {
     if($root === null) {$hu = strtok($pretext['request_uri'], '?'); $parts = $_GET;}
     elseif($root === '') $hu = hu;
     else {
-        $hu = strtok($root, '?');
         $qs = parse_url($root);
+        if(isset($qs['fragment'])) $root = str_replace('#'.$qs['fragment'], '', $root);
+        $hu = strtok($root, '?');
         if(!empty($qs['query'])) parse_str(str_replace('&amp;', '&', $qs['query']), $parts);
     }
 
