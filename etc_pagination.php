@@ -71,6 +71,15 @@ if (!defined('txpinterface'))
     @include_once('zem_tpl.php');
 
 # --- BEGIN PLUGIN CODE ---
+// TXP 4.6 tag registration
+if (class_exists('Textpattern_Tag_Registry')) {
+    Txp::get('Textpattern_Tag_Registry')
+        ->register('etc_pagination')
+        ->register('etc_numpages')
+        ->register('etc_offset')
+    ;
+}
+
 function etc_pagination($atts, $thing='') {
     global $thispage, $pretext;
 
