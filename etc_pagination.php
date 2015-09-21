@@ -73,338 +73,346 @@ if (!defined('txpinterface'))
 # --- BEGIN PLUGIN CODE ---
 // TXP 4.6 tag registration
 if (class_exists('Textpattern_Tag_Registry')) {
-    Txp::get('Textpattern_Tag_Registry')
-        ->register('etc_pagination')
-        ->register('etc_numpages')
-        ->register('etc_offset')
-    ;
+	Txp::get('Textpattern_Tag_Registry')
+		->register('etc_pagination')
+		->register('etc_numpages')
+		->register('etc_offset')
+	;
 }
 
 function etc_pagination($atts, $thing='') {
-    global $thispage, $pretext;
+	global $thispage, $pretext;
 
-    extract(lAtts(array(
-        "atts"=>'',
-        "break"=>'',
-        "class"=>'',
-        "current"=>'',
-        "delimiter"=>',',
-        "first"=>null,
-        "gap"=>'&hellip;',
-        "html_id"=>'',
-        "last"=>null,
-        "link"=>'{*}',
-        "mask"=>null,
-        "next"=>'',
-        "offset"=>0,
-        "page"=>null,
-        "pages"=>null,
-        "pgcounter"=>'pg',
-        "prev"=>'',
-        "range"=>-1,
-        "reversenumberorder"=>'0',
-        "root"=>null,
-        "query"=>'',
-        "wraptag"=>''
-    ),$atts));
+	extract(lAtts(array(
+		"root"=>null,
+		"query"=>'',
+		"pages"=>null,
+		"page"=>null,
+		"pgcounter"=>'pg',
+		"offset"=>0,
+		"range"=>-1,
+		"mask"=>null,
+		"link"=>'{*}',
+		"current"=>'',
+		"next"=>'',
+		"prev"=>'',
+		"first"=>null,
+		"last"=>null,
+		"gap"=>'&hellip;',
+		"delimiter"=>',',
+		"wraptag"=>'',
+		"break"=>'',
+		"class"=>'',
+		"html_id"=>'',
+		"atts"=>'',
+		"reversenumberorder"=>'0'
+	),$atts));
 
-    if(!isset($pages)) {
-        $numberOfTabs = isset($thispage['numPages']) ? $thispage['numPages'] : 1;
-        $pages = $numberOfTabs > 1 ? range(1, $numberOfTabs) : null;
-    }
-    elseif($cpages = (strpos($pages, $delimiter) !== false)) {
-        $numberOfTabs = count($pages = do_list($pages, $delimiter));
-    }
-    elseif(strpos($pages, '..') !== false) {
-        list($start, $end) = do_list($pages, '..');
-        $numberOfTabs = count($pages = range($start, $end));
-    } else {
-        $numberOfTabs = intval($pages);
-        $pages = range(1, $numberOfTabs);
-    }
-    if($numberOfTabs <= 1) return parse(EvalElse($thing, 0));
+	$cpages = 0;
+	if(!isset($pages)) {
+		$numberOfTabs = isset($thispage['numPages']) ? $thispage['numPages'] : 1;
+		$pages = $numberOfTabs > 1 ? range(1, $numberOfTabs) : null;
+	}
+	elseif(strpos($pages, $delimiter) !== false) {
+		$cpages = (strpos($pages, '::') !== false ? 2 : 1);
+		$numberOfTabs = count($pages = do_list($pages, $delimiter));
+	}
+	elseif(strpos($pages, '..') !== false) {
+		$cpages = 1;
+		list($start, $end) = do_list($pages, '..');
+		$numberOfTabs = count($pages = range($start, $end));
+	} else {
+		$numberOfTabs = intval($pages);
+		$pages = range(1, $numberOfTabs);
+	}
+	if($numberOfTabs <= 1) return parse(EvalElse($thing, 0));
 
-    # if we got tabs, start the outputting
-    $range = (int) $range;
-    if($range < 0) $range = $numberOfTabs; else $range += 1;
+	# if we got tabs, start the outputting
+	$range = (int) $range;
+	if($range < 0) $range = $numberOfTabs; else $range += 1;
 
-    $out = $parts = array();
-    $fragment = '';
-    if($root === '') $hu = hu;
-    elseif($root === null || $root[0] === '#') {$hu = strtok($pretext['request_uri'], '?'); $parts = $_GET; if($root) $fragment = $root;}
-    else {
-        $qs = parse_url($root);
-        if(isset($qs['fragment'])) $root = str_replace($fragment = '#'.$qs['fragment'], '', $root);
-        if(!empty($qs['query'])) parse_str(str_replace('&amp;', '&', $qs['query']), $parts);
-        $hu = strtok($root, '?');
-    }
+	$out = $parts = array();
+	$fragment = '';
+	if($root === '') $hu = hu;
+	elseif($root === null || $root[0] === '#') {$hu = strtok($pretext['request_uri'], '?'); $parts = $_GET; if($root) $fragment = $root;}
+	else {
+		$qs = parse_url($root);
+		if(isset($qs['fragment'])) $root = str_replace($fragment = '#'.$qs['fragment'], '', $root);
+		if(!empty($qs['query'])) parse_str(str_replace('&amp;', '&', $qs['query']), $parts);
+		$hu = strtok($root, '?');
+	}
 
-    if($query) foreach(do_list($query, '&') as $qs) {
-        @list($k, $v) = explode('=', $qs, 2);
-        if(isset($v)) if($k === '#') $fragment = '#'.$v; else $parts[$k] = $v;
-        elseif($k === '?') $parts = array();
-        elseif($k === '#') $fragment = '';
-        else unset($parts[$k]);
-    }
+	if($query) foreach(do_list($query, '&') as $qs) {
+		@list($k, $v) = explode('=', $qs, 2);
+		if(isset($v)) if($k === '#') $fragment = '#'.$v; else $parts[$k] = $v;
+		elseif($k === '?') $parts = array();
+		elseif($k === '#') $fragment = '';
+		else unset($parts[$k]);
+	}
 
-    if(isset($page))
-        if(!$cpages) $pgdefault = $reversenumberorder ? $numberOfTabs - intval($page) + 1 : intval($page);
-//        elseif(($pgdefault = array_search($page, $pages)) !== false) $pgdefault++;
-        else for($pgdefault = $numberOfTabs; $pgdefault > 1 && strpos($pages[$pgdefault-1].'::', $page.'::') !== 0; $pgdefault--);
-    else $pgdefault = $reversenumberorder ? $numberOfTabs : 1;
-    if(isset($parts[$pgcounter]))
-        if(!$cpages) $page = $reversenumberorder ? $numberOfTabs - intval($parts[$pgcounter]) + 1 : intval($parts[$pgcounter]);
-        else for($page = $numberOfTabs; $page > 1 && strpos($pages[$page-1].'::', $parts[$pgcounter].'::') !== 0; $page--);
-    else $page = $pgdefault;
-    $page += $offset;
-    if($page < 1 || $page > $numberOfTabs) return parse(EvalElse($thing, 0));
-    if($cpages) $pgdefault = $pages[$pgdefault - 1];
+	if(isset($page))
+		if(!$cpages) $pgdefault = intval($page);
+		elseif($cpages == 1)
+			if(($pgdefault = array_search($page, $pages)) !== false) $pgdefault++;
+			else $pgdefault = 0;
+		else for($pgdefault = $numberOfTabs; $pgdefault > 0 && strpos($pages[$pgdefault-1].'::', $page.'::') !== 0; $pgdefault--);
+	else $pgdefault = $reversenumberorder ? $numberOfTabs : 1;
+	if(isset($parts[$pgcounter]))
+		if(!$cpages) $page = intval($parts[$pgcounter]);
+		elseif($cpages == 1)
+			if(($page = array_search($parts[$pgcounter], $pages)) !== false) $page++;
+			else $page = 0;
+		else for($page = $numberOfTabs; $page > 0 && strpos($pages[$page-1].'::', $parts[$pgcounter].'::') !== 0; $page--);
+	else $page = $pgdefault;
+	$page += $offset;
+//	if($page < 1 || $page > $numberOfTabs) return parse(EvalElse($thing, 0));
+	if($cpages) $pgdefault = isset($pages[$pgdefault - 1]) ? $pages[$pgdefault - 1] : '';
 
-    unset($parts[$pgcounter]);
-    $qs = array();//join_qs($parts);
-    foreach($parts as $k => $v) $qs[] = urlencode($k) . '=' . urlencode(is_array($v) ? implode(',', $v) : $v);
-    $qs = '?'.implode('&amp;', $qs);
-    $pagebase = $qs !== '?' ? $hu.$qs : $hu;
-    if($qs !== '?') $qs .= '&amp;';
-    $pageurl = $pgcounter ? $hu.$qs.$pgcounter.'=' : '';
+	unset($parts[$pgcounter]);
+	$qs = array();//join_qs($parts);
+	foreach($parts as $k => $v) $qs[] = urlencode($k) . '=' . urlencode(is_array($v) ? implode(',', $v) : $v);
+	$qs = '?'.implode('&amp;', $qs);
+	$pagebase = $qs !== '?' ? $hu.$qs : $hu;
+	if($qs !== '?') $qs .= '&amp;';
+	$pageurl = $pgcounter ? $hu.$qs.$pgcounter.'=' : '';
 
-    $currentclass = (empty($thing) && $current && strpos($link, '{current}') === false ? ($break ? 1 : -1) : 0);
+	$currentclass = (empty($thing) && $current && strpos($link, '{current}') === false ? ($break ? 1 : -1) : 0);
 
-    @list($gap1, $gap2) = explode($delimiter, $gap); if(!isset($gap2)) $gap2 = $gap1;
-    @list($link, $link_) = explode($delimiter, $link, 2); if(!isset($link_)) $link_ = $link;
-    foreach(array('first', 'prev', 'next', 'last', 'current') as $item) if(isset($$item))
-        {@list($$item, ${$item.'_'}) = explode($delimiter, $$item, 2); if(!isset(${$item.'_'})) ${$item.'_'} = '';}
-    if($currentclass) {if($current) $current = " class='$current'"; if($current_) $current_ = " class='$current_'";}
+	@list($gap1, $gap2) = explode($delimiter, $gap); if(!isset($gap2)) $gap2 = $gap1;
+	@list($link, $link_) = explode($delimiter, $link, 2); if(!isset($link_)) $link_ = $link;
+	foreach(array('first', 'prev', 'next', 'last', 'current') as $item) if(isset($$item))
+		{@list($$item, ${$item.'_'}) = explode($delimiter, $$item, 2); if(!isset(${$item.'_'})) ${$item.'_'} = '';}
+	if($currentclass) {if($current) $current = " class='$current'"; if($current_) $current_ = " class='$current_'";}
 
-    $skip1 = $range < 3 ? $range : 1 + ($gap1 ? 1 : 0) + (isset($first) ? 0 : 1);
-    $skip2 = $range < 3 ? $range : 1 + ($gap2 ? 1 : 0) + (isset($last) ? 0 : 1);
-    if($numberOfTabs < 2*$range) {$loopStart = 1; $loopEnd = $numberOfTabs;}
-    elseif($page <= $range) {$loopStart = 1; $loopEnd = 2*$range - $skip2;}
-    elseif($page > $numberOfTabs - $range) {$loopStart = $numberOfTabs - 2*$range + $skip1 + 1; $loopEnd = $numberOfTabs;}
-    else {$loopStart = $page - $range + $skip1; $loopEnd = $page + $range - $skip2;}
+	$skip1 = $range < 3 ? $range : 1 + ($gap1 ? 1 : 0) + (isset($first) ? 0 : 1);
+	$skip2 = $range < 3 ? $range : 1 + ($gap2 ? 1 : 0) + (isset($last) ? 0 : 1);
+	if($numberOfTabs < 2*$range) {$loopStart = 1; $loopEnd = $numberOfTabs;}
+	elseif($page <= $range) {$loopStart = 1; $loopEnd = 2*$range - $skip2;}
+	elseif($page > $numberOfTabs - $range) {$loopStart = $numberOfTabs - 2*$range + $skip1 + 1; $loopEnd = $numberOfTabs;}
+	else {$loopStart = $page - $range + $skip1; $loopEnd = $page + $range - $skip2;}
 
 
-    if($custom = isset($mask)) {
-        if(isset($thing)) {$link = str_replace('{link}', $link, $thing); $link_ = str_replace('{link}', $link_, $thing);}
-        $thing = $mask;
-    }
-    elseif(!isset($thing)) {
-        if($link) $link = '<a href="{href}" rel="{rel}"'.($currentclass < 0 ? '{current}' : '').'>'.$link.'</a>';
-        if($link_) $link_ = '<span data-rel="self"'.($currentclass < 0 ? '{current}' : '').'>'.$link_.'</span>';
-        foreach(array('first', 'prev', 'next', 'last') as $item) {
-            if(!empty($$item)) $$item = '<a href="{href}" rel="{rel}">'.$$item.'</a>';
-            if(!empty(${$item.'_'})) ${$item.'_'} = '<span data-rel="'.$item.'">'.${$item.'_'}.'</span>';
-        }
-        if($gap1) $gap1 = '<span data-rel="gap">'.$gap1.'</span>';
-        if($gap2) $gap2 = '<span data-rel="gap">'.$gap2.'</span>';
-        $thing = '{link}';//'<a href="{href}" rel="{rel}" data-rel="{rel}">{link}</a>';
-    }
-    else $thing = EvalElse($thing, 1);
-    $replacements = array_fill_keys(array('{*}', '{#}', '{$}', '{href}', '{rel}', '{link}'), '');
-    $replacements['{pages}'] = $numberOfTabs;
-    $replacements['{current}'] = $current_;
-    $mask = array_fill_keys(array('{links}', '{first}', '{prev}', '{next}', '{last}', '{<+}', '{+>}'), '');
+	if($custom = isset($mask)) {
+		if(isset($thing)) {$link = str_replace('{link}', $link, $thing); $link_ = str_replace('{link}', $link_, $thing);}
+		$thing = $mask;
+	}
+	elseif(!isset($thing)) {
+		if($link) $link = '<a href="{href}" rel="{rel}"'.($currentclass < 0 ? '{current}' : '').'>'.$link.'</a>';
+		if($link_) $link_ = '<span data-rel="self"'.($currentclass < 0 ? '{current}' : '').'>'.$link_.'</span>';
+		foreach(array('first', 'prev', 'next', 'last') as $item) {
+			if(!empty($$item)) $$item = '<a href="{href}" rel="{rel}">'.$$item.'</a>';
+			if(!empty(${$item.'_'})) ${$item.'_'} = '<span data-rel="'.$item.'">'.${$item.'_'}.'</span>';
+		}
+		if($gap1) $gap1 = '<span data-rel="gap">'.$gap1.'</span>';
+		if($gap2) $gap2 = '<span data-rel="gap">'.$gap2.'</span>';
+		$thing = '{link}';//'<a href="{href}" rel="{rel}" data-rel="{rel}">{link}</a>';
+	}
+	else $thing = EvalElse($thing, 1);
+	$replacements = array_fill_keys(array('{*}', '{#}', '{$}', '{href}', '{rel}', '{link}'), '');
+	$replacements['{pages}'] = $numberOfTabs;
+	$replacements['{current}'] = $current_;
+	$mask = array_fill_keys(array('{links}', '{first}', '{prev}', '{next}', '{last}', '{<+}', '{+>}'), '');
 
-    $outfirst = $outprev = $outgap = '';
-    if($prev || $prev_) {
-        if($page > 1) if($cpages) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page-2].'::'.$pages[$page-2]);
-            else $replacements['{#}'] = $replacements['{*}'] = $pages[$page-2];
-        else $replacements['{#}'] = $replacements['{*}'] = '';
-        $replacements['{$}'] = $page-1;
-        $replacements['{href}'] = ($replacements['{#}']  == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-        $replacements['{rel}'] = 'prev';
-        $replacements['{link}'] = $mask['{prev}'] = strtr($page > 1 ? $prev : $prev_, $replacements);
-        if(!$custom && $replacements['{link}']) $outprev = strtr($thing, $replacements);
-    }
+	$outfirst = $outprev = $outgap = '';
+	if($prev || $prev_) {
+		if($page > 1) if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page-2].'::'.$pages[$page-2]);
+			else $replacements['{#}'] = $replacements['{*}'] = $pages[$page-2];
+		else $replacements['{#}'] = $replacements['{*}'] = '';
+		$replacements['{$}'] = $page-1;
+		$replacements['{href}'] = ($replacements['{#}']  == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+		$replacements['{rel}'] = 'prev';
+		$replacements['{link}'] = $mask['{prev}'] = strtr($page > 1 ? $prev : $prev_, $replacements);
+		if(!$custom && $replacements['{link}']) $outprev = strtr($thing, $replacements);
+	}
 
-    if($loopStart > 1 && $range > 1 || isset($first)) {
-        if($cpages) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[0].'::'.$pages[0]);
-        else $replacements['{#}'] = $replacements['{*}'] = $pages[0];
-        $replacements['{$}'] = 1;
-        $replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-        $replacements['{rel}'] = '';
-        $replacements['{link}'] = $mask['{first}'] = strtr(isset($first) ? ($page > 1 ? $first : $first_) : $link, $replacements);
-        if(!$custom && $replacements['{link}']) $outfirst = strtr($thing, $replacements);
-        if($gap1 && $loopStart > 1) 
-            if($custom) $mask['{<+}'] = $gap1; else $outgap = $gap1;
-    }
+	if($loopStart > 1 && $range > 1 || isset($first)) {
+		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[0].'::'.$pages[0]);
+		else $replacements['{#}'] = $replacements['{*}'] = $pages[0];
+		$replacements['{$}'] = 1;
+		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+		$replacements['{rel}'] = '';
+		$replacements['{link}'] = $mask['{first}'] = strtr(isset($first) ? ($page > 1 ? $first : $first_) : $link, $replacements);
+		if(!$custom && $replacements['{link}']) $outfirst = strtr($thing, $replacements);
+		if($gap1 && $loopStart > 1) 
+			if($custom) $mask['{<+}'] = $gap1; else $outgap = $gap1;
+	}
 
-    if($first) {
-        if($outfirst) $out[] = $outfirst; if($outprev) $out[] = $outprev;
-    } else {
-        if($outprev) $out[] = $outprev; if($outfirst) $out[] = $outfirst;
-    }
-    if($outgap) $out[] = $outgap;
+	if($first) {
+		if($outfirst) $out[] = $outfirst; if($outprev) $out[] = $outprev;
+	} else {
+		if($outprev) $out[] = $outprev; if($outfirst) $out[] = $outfirst;
+	}
+	if($outgap) $out[] = $outgap;
 
-    if($link || $link_) for($i=$loopStart; $i<=$loopEnd; $i++) {
-        if($cpages) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$i-1].'::'.$pages[$i-1]);
-        else $replacements['{#}'] = $replacements['{*}'] = $pages[$i-1];
-        $replacements['{$}'] = $i;
-        $replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-        $self = $i == $page;
-        $replacements['{rel}'] = $i == $page-1 ? 'prev' : ($i == $page+1 ? 'next' : '');
-        $replacements['{current}'] = $self ? $current : $current_;
-        if($replacements['{link}'] = strtr($self ? $link_ : $link, $replacements))
-            if($custom) $mask['{links}'] .= $replacements['{link}'];
-            else $out[] = ($currentclass > 0 ? ($self ? '{current}' : '{current_}') : '').strtr($thing, $replacements);
-    }
+	if($link || $link_) for($i=$loopStart; $i<=$loopEnd; $i++) {
+		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$i-1].'::'.$pages[$i-1]);
+		else $replacements['{#}'] = $replacements['{*}'] = $pages[$i-1];
+		$replacements['{$}'] = $i;
+		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+		$self = $i == $page;
+		$replacements['{rel}'] = $i == $page-1 ? 'prev' : ($i == $page+1 ? 'next' : '');
+		$replacements['{current}'] = $self ? $current : $current_;
+		if($replacements['{link}'] = strtr($self ? $link_ : $link, $replacements))
+			if($custom) $mask['{links}'] .= $replacements['{link}'];
+			else $out[] = ($currentclass > 0 ? ($self ? '{current}' : '{current_}') : '').strtr($thing, $replacements);
+	}
 
-    $outlast = $outnext = $outgap = '';
-    $replacements['{current}'] = $current_;
-    if($loopEnd < $numberOfTabs && $range > 1 || isset($last)) {
-        if($cpages) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$numberOfTabs-1].'::'.$pages[$numberOfTabs-1]);
-        else $replacements['{#}'] = $replacements['{*}'] = $pages[$numberOfTabs-1];
-        $replacements['{$}'] = $numberOfTabs;
-        $replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-        $replacements['{rel}'] = '';
-        $replacements['{link}'] = $mask['{last}'] = strtr(isset($last) ? ($page < $numberOfTabs ? $last : $last_) : $link, $replacements);
-        if($gap2 && $loopEnd < $numberOfTabs) 
-            if($custom) $mask['{+>}'] = $gap2; else $outgap = $gap2;
-        if(!$custom && $replacements['{link}']) $outlast = strtr($thing, $replacements);
-    }
+	$outlast = $outnext = $outgap = '';
+	$replacements['{current}'] = $current_;
+	if($loopEnd < $numberOfTabs && $range > 1 || isset($last)) {
+		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$numberOfTabs-1].'::'.$pages[$numberOfTabs-1]);
+		else $replacements['{#}'] = $replacements['{*}'] = $pages[$numberOfTabs-1];
+		$replacements['{$}'] = $numberOfTabs;
+		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+		$replacements['{rel}'] = '';
+		$replacements['{link}'] = $mask['{last}'] = strtr(isset($last) ? ($page < $numberOfTabs ? $last : $last_) : $link, $replacements);
+		if($gap2 && $loopEnd < $numberOfTabs) 
+			if($custom) $mask['{+>}'] = $gap2; else $outgap = $gap2;
+		if(!$custom && $replacements['{link}']) $outlast = strtr($thing, $replacements);
+	}
 
-    if($next || $next_) {
-        if($page < $numberOfTabs) if($cpages) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page].'::'.$pages[$page]);
-            else $replacements['{#}'] = $replacements['{*}'] = $pages[$page];
-        else $replacements['{#}'] = $replacements['{*}'] = '';
-        $replacements['{$}'] = $page+1;
-        $replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-        $replacements['{rel}'] = 'next';
-        $replacements['{link}'] = $mask['{next}'] = strtr($page < $numberOfTabs ? $next : $next_, $replacements);
-        if(!$custom && $replacements['{link}']) $outnext = strtr($thing, $replacements);
-    }
+	if($next || $next_) {
+		if($page < $numberOfTabs) if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page].'::'.$pages[$page]);
+			else $replacements['{#}'] = $replacements['{*}'] = $pages[$page];
+		else $replacements['{#}'] = $replacements['{*}'] = '';
+		$replacements['{$}'] = $page+1;
+		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+		$replacements['{rel}'] = 'next';
+		$replacements['{link}'] = $mask['{next}'] = strtr($page < $numberOfTabs ? $next : $next_, $replacements);
+		if(!$custom && $replacements['{link}']) $outnext = strtr($thing, $replacements);
+	}
 
-    if($outgap) $out[] = $outgap;
-    if($last) {
-        if($outnext) $out[] = $outnext; if($outlast) $out[] = $outlast;
-    } else {
-        if($outlast) $out[] = $outlast; if($outnext) $out[] = $outnext;
-    }
+	if($outgap) $out[] = $outgap;
+	if($last) {
+		if($outnext) $out[] = $outnext; if($outlast) $out[] = $outlast;
+	} else {
+		if($outlast) $out[] = $outlast; if($outnext) $out[] = $outnext;
+	}
 
-    if($atts) $atts = ' '.$atts;
-    if($custom) $out = array(strtr($thing, $mask));
-    if($reversenumberorder) $out = array_reverse($out);
-    $out = doWrap($out, $wraptag, $break, $class, '', $atts, '', $html_id);
-    if($currentclass > 0) $out = str_replace(array("<$break>{current}", "<$break>{current_}"), array("<{$break}{$current}>", "<{$break}{$current_}>"), $out);
-    return parse($out);
+	if($atts) $atts = ' '.$atts;
+	if($custom) $out = array(strtr($thing, $mask));
+	if($reversenumberorder) $out = array_reverse($out);
+	$out = doWrap($out, $wraptag, $break, $class, '', $atts, '', $html_id);
+	if($currentclass > 0) $out = str_replace(array("<$break>{current}", "<$break>{current_}"), array("<{$break}{$current}>", "<{$break}{$current_}>"), $out);
+	return parse($out);
 }
 
 // -------------------------------------------------------------
-    function etc_numpages($atts)
-    {
-        global $pretext, $prefs, $thispage, $etc_pagination_total;
-        if(empty($atts) && isset($thispage)) {$etc_pagination_total = $thispage['total']; return empty($thispage['numPages']) ? 1 : $thispage['numPages'];}
-        extract($pretext);
-        if(empty($atts['table']) && !isset($atts['total'])) {
-            $customFields = getCustomFields();
-            $customlAtts = array_null(array_flip($customFields));
-        } else $customFields = $customlAtts = array();
+	function etc_numpages($atts)
+	{
+		global $pretext, $prefs, $thispage, $etc_pagination_total;
+		if(empty($atts) && isset($thispage)) {$etc_pagination_total = $thispage['total']; return empty($thispage['numPages']) ? 1 : $thispage['numPages'];}
+		extract($pretext);
+		if(empty($atts['table']) && !isset($atts['total'])) {
+			$customFields = getCustomFields();
+			$customlAtts = array_null(array_flip($customFields));
+		} else $customFields = $customlAtts = array();
 
-        //getting attributes
-        extract(lAtts(array(
-            'table'         => '',
-            'total'         => null,
-            'limit'         => 10,
-            'pageby'        => '',
-            'category'      => '',
-            'section'       => '',
-            'exclude'       => '',
-            'include'       => '',
-            'excerpted'     => '',
-            'author'        => '',
-            'realname'       => '',
-            'month'         => '',
-            'keywords'      => '',
-            'expired'       => $prefs['publish_expired_articles'],
-            'id'            => '',
-            'time'          => 'past',
-            'status'        => '4',
-            'offset'        => 0
-        )+$customlAtts, $atts));
+		//getting attributes
+		extract(lAtts(array(
+			'table'         => '',
+			'total'         => null,
+			'limit'         => 10,
+			'pageby'        => '',
+			'category'      => '',
+			'section'       => '',
+			'exclude'       => '',
+			'include'       => '',
+			'excerpted'     => '',
+			'author'        => '',
+			'realname'       => '',
+			'month'         => '',
+			'keywords'      => '',
+			'expired'       => $prefs['publish_expired_articles'],
+			'id'            => '',
+			'time'          => 'past',
+			'status'        => '4',
+			'offset'        => 0
+		)+$customlAtts, $atts));
 
-        if(!($pageby = intval(empty($pageby) ? $limit : $pageby))) return 0;
-        if(isset($total)) return ceil(intval($total)/$pageby);
+		if(!($pageby = intval(empty($pageby) ? $limit : $pageby))) return 0;
+		if(isset($total)) return ceil(intval($total)/$pageby);
 
-        $where = array("1");
+		$where = array("1");
 
-        //Building query parts
-        $category  = join("','", doSlash(do_list($category)));
-        if($category) $where[] = !$table ? "(Category1 IN ('".$category."') or Category2 IN ('".$category."'))" : "category IN ('".$category."')";
-        if($author) $where[] = (!$table ? "AuthorID" : "author")." IN ('".join("','", doSlash(do_list($author)))."')";
-        if($id) $where[] = "ID IN (".join(',', array_map('intval', do_list($id))).")";
-        if($status && (!$table || $table == 'file')) $where[] = 'Status in('.implode(',', doSlash(do_list($status))).')';
-        if ($realname) {
-            $authorlist = safe_column('name', 'txp_users', "RealName IN ('". join("','", doArray(doSlash(do_list($realname)), 'urldecode')) ."')" );
-            $where[] = (!$table ? "AuthorID" : "author")." IN ('".join("','", doSlash($authorlist))."')";
-        }
-        if(!$table) {
-            if($section) $where[] = "Section IN ('".join("','", doSlash(do_list($section)))."')";
-            if($month) $where[] = "Posted like '".doSlash($month)."%'";
-            if($excerpted=='y' || $excerpted=='1') $where[] = "Excerpt !=''";
-            switch ($time) {
-                case 'past':
-                    $where[] = "Posted <= now()"; break;
-                case 'future':
-                    $where[] = "Posted > now()"; break;
-            }
-            if (!$expired) {
-                $where[] = "(now() <= Expires or Expires = ".NULLDATETIME.")";
-            }
-            //Allow keywords for no-custom articles. That tagging mode, you know
-            if ($keywords) {
-                $keys = doSlash(do_list($keywords));
-                foreach ($keys as $key) {
-                    $keyparts[] = "FIND_IN_SET('".$key."',Keywords)";
-                }
-                $where[] = "(" . join(' or ',$keyparts) . ")";
-            }
-        } else {
-            if($include) $where[] = "name IN ('".join("','", doSlash(do_list($include)))."')";
-            if($exclude) $where[] = "name NOT IN ('".join("','", doSlash(do_list($exclude)))."')";
-        }
+		//Building query parts
+		$category  = join("','", doSlash(do_list($category)));
+		if($category) $where[] = !$table ? "(Category1 IN ('".$category."') or Category2 IN ('".$category."'))" : "category IN ('".$category."')";
+		if($author) $where[] = (!$table ? "AuthorID" : "author")." IN ('".join("','", doSlash(do_list($author)))."')";
+		if($id) $where[] = "ID IN (".join(',', array_map('intval', do_list($id))).")";
+		if($status && (!$table || $table == 'file')) $where[] = 'Status in('.implode(',', doSlash(do_list($status))).')';
+		if ($realname) {
+			$authorlist = safe_column('name', 'txp_users', "RealName IN ('". join("','", doArray(doSlash(do_list($realname)), 'urldecode')) ."')" );
+			$where[] = (!$table ? "AuthorID" : "author")." IN ('".join("','", doSlash($authorlist))."')";
+		}
+		if(!$table) {
+			if($section) $where[] = "Section IN ('".join("','", doSlash(do_list($section)))."')";
+			if($month) $where[] = "Posted like '".doSlash($month)."%'";
+			if($excerpted=='y' || $excerpted=='1') $where[] = "Excerpt !=''";
+			switch ($time) {
+				case 'past':
+					$where[] = "Posted <= now()"; break;
+				case 'future':
+					$where[] = "Posted > now()"; break;
+			}
+			if (!$expired) {
+				$where[] = "(now() <= Expires or Expires = ".NULLDATETIME.")";
+			}
+			//Allow keywords for no-custom articles. That tagging mode, you know
+			if ($keywords) {
+				$keys = doSlash(do_list($keywords));
+				foreach ($keys as $key) {
+					$keyparts[] = "FIND_IN_SET('".$key."',Keywords)";
+				}
+				$where[] = "(" . join(' or ',$keyparts) . ")";
+			}
+		} else {
+			if($include) $where[] = "name IN ('".join("','", doSlash(do_list($include)))."')";
+			if($exclude) $where[] = "name NOT IN ('".join("','", doSlash(do_list($exclude)))."')";
+		}
 
-        $customq = '';
-        if ($customFields) {
-            foreach($customFields as $cField) {
-                if (isset($atts[$cField]))
-                    $customPairs[$cField] = $atts[$cField];
-            }
-            if(!empty($customPairs)) {
-                $customq = buildCustomSql($customFields,$customPairs);
-            }
-        }
+		$customq = '';
+		if ($customFields) {
+			foreach($customFields as $cField) {
+				if (isset($atts[$cField]))
+					$customPairs[$cField] = $atts[$cField];
+			}
+			if(!empty($customPairs)) {
+				$customq = buildCustomSql($customFields,$customPairs);
+			}
+		}
 
-//        $where = "1=1" . $statusq. $time. $search . $id . $category . $section . $excerpted . $month . $author . $keywords . $customq;
-        $where = implode(' AND ', $where) . $customq;
+//		$where = "1=1" . $statusq. $time. $search . $id . $category . $section . $excerpted . $month . $author . $keywords . $customq;
+		$where = implode(' AND ', $where) . $customq;
 
-        //paginate
-        $grand_total = safe_count($table ? 'txp_'.$table : 'textpattern', $where);
-        $etc_pagination_total = $grand_total - $offset;
-        return ceil($etc_pagination_total/$pageby);
-    }
+		//paginate
+		$grand_total = safe_count($table ? 'txp_'.$table : 'textpattern', $where);
+		$etc_pagination_total = $grand_total - $offset;
+		return ceil($etc_pagination_total/$pageby);
+	}
 
-    function etc_offset($atts)
-    {
-        //getting attributes
-        extract(lAtts(array(
-            'type'        => '',
-            'pageby'        => '10',
-            'pgcounter'        => 'pg',
-            'offset'        => '0'
-        ), $atts));
+	function etc_offset($atts)
+	{
+		//getting attributes
+		extract(lAtts(array(
+			'type'        => '',
+			'pageby'        => '10',
+			'pgcounter'        => 'pg',
+			'offset'        => '0'
+		), $atts));
 
-        global $etc_pagination_total;
-        $counter = urldecode(gps($pgcounter));
-        $page = max(intval($counter), 1) + $offset;
-        $max = isset($etc_pagination_total) ? $etc_pagination_total : $page*$pageby;
-        switch($type) {
-            case 'value' : return htmlspecialchars($counter, ENT_QUOTES);
-            case 'page' : return $page;
-            case 'start' : return min($max, ($page - 1)*$pageby + 1);
-            case 'end' : return min($max, $page*$pageby);
-            default : return ($page - 1)*$pageby;
-        }
-    }
+		global $etc_pagination_total;
+		$counter = urldecode(gps($pgcounter));
+		$page = max(intval($counter), 1) + $offset;
+		$max = isset($etc_pagination_total) ? $etc_pagination_total : $page*$pageby;
+		switch($type) {
+			case 'value' : return htmlspecialchars($counter, ENT_QUOTES);
+			case 'page' : return $page;
+			case 'start' : return min($max, ($page - 1)*$pageby + 1);
+			case 'end' : return min($max, $page*$pageby);
+			default : return ($page - 1)*$pageby;
+		}
+	}
 # --- END PLUGIN CODE ---
 if (0) {
 ?>
