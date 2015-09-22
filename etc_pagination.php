@@ -87,6 +87,7 @@ function etc_pagination($atts, $thing='') {
 		"root"=>null,
 		"query"=>'',
 		"pages"=>null,
+//		"links"=>null,
 		"page"=>null,
 		"pgcounter"=>'pg',
 		"offset"=>0,
@@ -125,9 +126,13 @@ function etc_pagination($atts, $thing='') {
 		$numberOfTabs = intval($pages);
 		$pages = range(1, $numberOfTabs);
 	}
+
 	if($numberOfTabs <= 1) return parse(EvalElse($thing, 0));
 
 	# if we got tabs, start the outputting
+	if(isset($links)) $links = array_pad(do_list($links, $delimiter), $numberOfTabs, '');
+	elseif($cpages < 2) if($reversenumberorder) $links = array_reverse($pages); else $links = &$pages;
+
 	$range = (int) $range;
 	if($range < 0) $range = $numberOfTabs; else $range += 1;
 
@@ -158,15 +163,13 @@ function etc_pagination($atts, $thing='') {
 		else for($pgdefault = $numberOfTabs; $pgdefault > 0 && strpos($pages[$pgdefault-1].'::', $page.'::') !== 0; $pgdefault--);
 	else $pgdefault = $reversenumberorder ? $numberOfTabs : 1;
 	if(isset($parts[$pgcounter]))
-		if(!$cpages) $page = intval($parts[$pgcounter]);
-		elseif($cpages == 1)
-			if(($page = array_search($parts[$pgcounter], $pages)) !== false) $page++;
+		if($cpages < 2)
+			if(($page = array_search($parts[$pgcounter], $links)) !== false) $page++;
 			else $page = 0;
 		else for($page = $numberOfTabs; $page > 0 && strpos($pages[$page-1].'::', $parts[$pgcounter].'::') !== 0; $page--);
 	else $page = $pgdefault;
 	$page += $offset;
 //	if($page < 1 || $page > $numberOfTabs) return parse(EvalElse($thing, 0));
-	if($cpages) $pgdefault = isset($pages[$pgdefault - 1]) ? $pages[$pgdefault - 1] : '';
 
 	unset($parts[$pgcounter]);
 	$qs = array();//join_qs($parts);
@@ -216,10 +219,11 @@ function etc_pagination($atts, $thing='') {
 	$outfirst = $outprev = $outgap = '';
 	if($prev || $prev_) {
 		if($page > 1) if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page-2].'::'.$pages[$page-2]);
-			else $replacements['{#}'] = $replacements['{*}'] = $pages[$page-2];
+			else {$replacements['{*}'] = $pages[$page-2]; $replacements['{#}'] = $links[$page-2];}
 		else $replacements['{#}'] = $replacements['{*}'] = '';
 		$replacements['{$}'] = $page-1;
-		$replacements['{href}'] = ($replacements['{#}']  == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
+		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
 		$replacements['{rel}'] = 'prev';
 		$replacements['{link}'] = $mask['{prev}'] = strtr($page > 1 ? $prev : $prev_, $replacements);
 		if(!$custom && $replacements['{link}']) $outprev = strtr($thing, $replacements);
@@ -227,9 +231,10 @@ function etc_pagination($atts, $thing='') {
 
 	if($loopStart > 1 && $range > 1 || isset($first)) {
 		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[0].'::'.$pages[0]);
-		else $replacements['{#}'] = $replacements['{*}'] = $pages[0];
+		else {$replacements['{*}'] = $pages[0]; $replacements['{#}'] = $links[0];}
 		$replacements['{$}'] = 1;
-		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
+		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
 		$replacements['{rel}'] = '';
 		$replacements['{link}'] = $mask['{first}'] = strtr(isset($first) ? ($page > 1 ? $first : $first_) : $link, $replacements);
 		if(!$custom && $replacements['{link}']) $outfirst = strtr($thing, $replacements);
@@ -246,9 +251,10 @@ function etc_pagination($atts, $thing='') {
 
 	if($link || $link_) for($i=$loopStart; $i<=$loopEnd; $i++) {
 		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$i-1].'::'.$pages[$i-1]);
-		else $replacements['{#}'] = $replacements['{*}'] = $pages[$i-1];
+		else {$replacements['{*}'] = $pages[$i-1]; $replacements['{#}'] = $links[$i-1];}
 		$replacements['{$}'] = $i;
-		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
+		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
 		$self = $i == $page;
 		$replacements['{rel}'] = $i == $page-1 ? 'prev' : ($i == $page+1 ? 'next' : '');
 		$replacements['{current}'] = $self ? $current : $current_;
@@ -261,9 +267,10 @@ function etc_pagination($atts, $thing='') {
 	$replacements['{current}'] = $current_;
 	if($loopEnd < $numberOfTabs && $range > 1 || isset($last)) {
 		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$numberOfTabs-1].'::'.$pages[$numberOfTabs-1]);
-		else $replacements['{#}'] = $replacements['{*}'] = $pages[$numberOfTabs-1];
+		else {$replacements['{*}'] = $pages[$numberOfTabs-1]; $replacements['{#}'] = $links[$numberOfTabs-1];}
 		$replacements['{$}'] = $numberOfTabs;
-		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
+		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
 		$replacements['{rel}'] = '';
 		$replacements['{link}'] = $mask['{last}'] = strtr(isset($last) ? ($page < $numberOfTabs ? $last : $last_) : $link, $replacements);
 		if($gap2 && $loopEnd < $numberOfTabs) 
@@ -273,10 +280,11 @@ function etc_pagination($atts, $thing='') {
 
 	if($next || $next_) {
 		if($page < $numberOfTabs) if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page].'::'.$pages[$page]);
-			else $replacements['{#}'] = $replacements['{*}'] = $pages[$page];
+			else {$replacements['{*}'] = $pages[$page]; $replacements['{#}'] = $links[$page];}
 		else $replacements['{#}'] = $replacements['{*}'] = '';
 		$replacements['{$}'] = $page+1;
-		$replacements['{href}'] = ($replacements['{#}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
+		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
 		$replacements['{rel}'] = 'next';
 		$replacements['{link}'] = $mask['{next}'] = strtr($page < $numberOfTabs ? $next : $next_, $replacements);
 		if(!$custom && $replacements['{link}']) $outnext = strtr($thing, $replacements);
