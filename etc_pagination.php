@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_pagination';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.4.4';
+$plugin['version'] = '0.4.6';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'http://www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Google-style pagination';
@@ -28,7 +28,7 @@ $plugin['description'] = 'Google-style pagination';
 // (1...4) to prepare the environment for everything else that follows.
 // Values 6...9 should be considered for plugins which would work late.
 // This order is user-overrideable.
-$plugin['order'] = '5';
+$plugin['order'] = '3';
 
 // Plugin 'type' defines where the plugin is loaded
 // 0 = public              : only on the public side of the website (default)
@@ -72,16 +72,23 @@ if (!defined('txpinterface'))
 
 # --- BEGIN PLUGIN CODE ---
 // TXP 4.6 tag registration
-if (class_exists('Textpattern_Tag_Registry')) {
-	Txp::get('Textpattern_Tag_Registry')
+	if(class_exists('\Textpattern\Tag\Registry')) Txp::get('\Textpattern\Tag\Registry')
 		->register('etc_pagination')
 		->register('etc_numpages')
 		->register('etc_offset')
 	;
+
+if (@txpinterface == 'public') {
+	register_callback('etc_pagination_url', 'pretext'); 
+}
+
+function etc_pagination_url($event, $step) {
+	global $etc_pagination;
+	$etc_pagination['url'] = preg_replace("|^https?://[^/]+|i","",serverSet('REQUEST_URI'));
 }
 
 function etc_pagination($atts, $thing='') {
-	global $thispage, $pretext;
+	global $thispage, $etc_pagination;
 
 	extract(lAtts(array(
 		"root"=>null,
@@ -92,6 +99,7 @@ function etc_pagination($atts, $thing='') {
 		"pgcounter"=>'pg',
 		"offset"=>0,
 		"range"=>-1,
+		"scale"=>1,
 		"mask"=>null,
 		"link"=>'{*}',
 		"current"=>'',
@@ -109,6 +117,7 @@ function etc_pagination($atts, $thing='') {
 		"reversenumberorder"=>'0'
 	),$atts));
 
+	$etc_pagination['pgcounter'] = $pgcounter;
 	$cpages = 0;
 	if(!isset($pages)) {
 		$numberOfTabs = isset($thispage['numPages']) ? $thispage['numPages'] : 1;
@@ -131,15 +140,19 @@ function etc_pagination($atts, $thing='') {
 
 	# if we got tabs, start the outputting
 	if(isset($links)) $links = array_pad(do_list($links, $delimiter), $numberOfTabs, '');
-	elseif($cpages < 2) if($reversenumberorder) $links = array_reverse($pages); else $links = &$pages;
+	elseif($cpages < 2)
+		if($reversenumberorder) $links = array_reverse($pages); else $links = &$pages;
+	else $links = array();
 
 	$range = (int) $range;
 	if($range < 0) $range = $numberOfTabs; else $range += 1;
+	if($scale == 'auto') $scale = pow($numberOfTabs, 1/$range);
+	else $scale = max(floatval($scale), 1);
 
 	$out = $parts = array();
 	$fragment = '';
 	if($root === '') $hu = hu;
-	elseif($root === null || $root[0] === '#') {$hu = strtok($pretext['request_uri'], '?'); $parts = $_GET; if($root) $fragment = $root;}
+	elseif($root === null || $root[0] === '#') {$hu = strtok($etc_pagination['url'], '?'); $parts = $_GET; if($root) $fragment = $root;}
 	else {
 		$qs = parse_url($root);
 		if(isset($qs['fragment'])) $root = str_replace($fragment = '#'.$qs['fragment'], '', $root);
@@ -149,10 +162,13 @@ function etc_pagination($atts, $thing='') {
 
 	if($query) foreach(do_list($query, '&') as $qs) {
 		@list($k, $v) = explode('=', $qs, 2);
-		if(isset($v)) if($k === '#') $fragment = '#'.$v; else $parts[$k] = $v;
-		elseif($k === '?') $parts = array();
-		elseif($k === '#') $fragment = '';
-		else unset($parts[$k]);
+		if(!isset($v)) if($k === '?') $parts = array();
+			elseif($k === '#') $fragment = '';
+			else unset($parts[$k]);
+		else if($k === '#') $fragment = '#'.$v;
+			elseif($k === '+') $hu .= $v;
+			elseif($k[0] === '/') $hu = preg_replace($k, $v, $hu);
+			else $parts[$k] = $v;
 	}
 
 	if(isset($page))
@@ -168,6 +184,7 @@ function etc_pagination($atts, $thing='') {
 			else $page = 0;
 		else for($page = $numberOfTabs; $page > 0 && strpos($pages[$page-1].'::', $parts[$pgcounter].'::') !== 0; $page--);
 	else $page = $pgdefault;
+	$etc_pagination['page'] = $page;
 	$page += $offset;
 //	if($page < 1 || $page > $numberOfTabs) return parse(EvalElse($thing, 0));
 
@@ -194,21 +211,18 @@ function etc_pagination($atts, $thing='') {
 	elseif($page > $numberOfTabs - $range) {$loopStart = $numberOfTabs - 2*$range + $skip1 + 1; $loopEnd = $numberOfTabs;}
 	else {$loopStart = $page - $range + $skip1; $loopEnd = $page + $range - $skip2;}
 
-
 	if($custom = isset($mask)) {
 		if(isset($thing)) {$link = str_replace('{link}', $link, $thing); $link_ = str_replace('{link}', $link_, $thing);}
 		$thing = $mask;
 	}
 	elseif(!isset($thing)) {
-		if($link) $link = '<a href="{href}" rel="{rel}"'.($currentclass < 0 ? '{current}' : '').'>'.$link.'</a>';
+		if($link) $link = '<a href="{href}" data-rel="{rel}"'.($currentclass < 0 ? '{current}' : '').'>'.$link.'</a>';
 		if($link_) $link_ = '<span data-rel="self"'.($currentclass < 0 ? '{current}' : '').'>'.$link_.'</span>';
-		foreach(array('first', 'prev', 'next', 'last') as $item) {
-			if(!empty($$item)) $$item = '<a href="{href}" rel="{rel}">'.$$item.'</a>';
+		foreach(array('first', 'prev', 'next', 'last', 'gap1', 'gap2') as $item) {
+			if(!empty($$item)) $$item = '<a href="{href}" rel="{rel}" title="{*}">'.$$item.'</a>';
 			if(!empty(${$item.'_'})) ${$item.'_'} = '<span data-rel="'.$item.'">'.${$item.'_'}.'</span>';
 		}
-		if($gap1) $gap1 = '<span data-rel="gap">'.$gap1.'</span>';
-		if($gap2) $gap2 = '<span data-rel="gap">'.$gap2.'</span>';
-		$thing = '{link}';//'<a href="{href}" rel="{rel}" data-rel="{rel}">{link}</a>';
+		$thing = '{link}';
 	}
 	else $thing = EvalElse($thing, 1);
 	$replacements = array_fill_keys(array('{*}', '{#}', '{$}', '{href}', '{rel}', '{link}'), '');
@@ -218,28 +232,27 @@ function etc_pagination($atts, $thing='') {
 
 	$outfirst = $outprev = $outgap = '';
 	if($prev || $prev_) {
-		if($page > 1) if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page-2].'::'.$pages[$page-2]);
-			else {$replacements['{*}'] = $pages[$page-2]; $replacements['{#}'] = $links[$page-2];}
-		else $replacements['{#}'] = $replacements['{*}'] = '';
-		$replacements['{$}'] = $page-1;
-//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
-		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-		$replacements['{rel}'] = 'prev';
+		etc_pagination_link($replacements, $links, $pages, $page-1, $pgdefault, $pagebase, $pageurl, $fragment, 'prev', $cpages>1);
+		if($page <= 1) $replacements['{#}'] = $replacements['{*}'] = '';
 		$replacements['{link}'] = $mask['{prev}'] = strtr($page > 1 ? $prev : $prev_, $replacements);
 		if(!$custom && $replacements['{link}']) $outprev = strtr($thing, $replacements);
 	}
 
 	if($loopStart > 1 && $range > 1 || isset($first)) {
-		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[0].'::'.$pages[0]);
-		else {$replacements['{*}'] = $pages[0]; $replacements['{#}'] = $links[0];}
-		$replacements['{$}'] = 1;
-//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
-		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-		$replacements['{rel}'] = '';
+		etc_pagination_link($replacements, $links, $pages, 1, $pgdefault, $pagebase, $pageurl, $fragment, '', $cpages>1);
 		$replacements['{link}'] = $mask['{first}'] = strtr(isset($first) ? ($page > 1 ? $first : $first_) : $link, $replacements);
 		if(!$custom && $replacements['{link}']) $outfirst = strtr($thing, $replacements);
-		if($gap1 && $loopStart > 1)
-			if($custom) $mask['{<+}'] = $gap1; else $outgap = $gap1;
+		if($gap1 && $loopStart > 1) {
+//			if($custom) $mask['{<+}'] = $gap1; else $outgap = $gap1;
+			$i = $loopStart-$range-1+$skip2;
+			if($scale > 1 && $i >= $scale) {
+				$n = pow($scale, min(floor(log($i, $scale)), ceil(log($numberOfTabs - $i + 1, $scale)))); $i = intval(floor($i/$n)*$n);
+			}
+			$i = max($range ? 2 : 1, $i);
+			etc_pagination_link($replacements, $links, $pages, $i, $pgdefault, $pagebase, $pageurl, $fragment, 'prev', $cpages>1);
+			if($replacements['{link}'] = strtr($gap1, $replacements))
+				if($custom) $mask['{<+}'] .= strtr($thing, $replacements); else $outgap = strtr($thing, $replacements);
+		}
 	}
 
 	if($first) {
@@ -250,13 +263,8 @@ function etc_pagination($atts, $thing='') {
 	if($outgap) $out[] = $outgap;
 
 	if($link || $link_) for($i=$loopStart; $i<=$loopEnd; $i++) {
-		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$i-1].'::'.$pages[$i-1]);
-		else {$replacements['{*}'] = $pages[$i-1]; $replacements['{#}'] = $links[$i-1];}
-		$replacements['{$}'] = $i;
-//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
-		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+		etc_pagination_link($replacements, $links, $pages, $i, $pgdefault, $pagebase, $pageurl, $fragment, $i == $page-1 ? 'prev' : ($i == $page+1 ? 'next' : ''), $cpages>1);
 		$self = $i == $page;
-		$replacements['{rel}'] = $i == $page-1 ? 'prev' : ($i == $page+1 ? 'next' : '');
 		$replacements['{current}'] = $self ? $current : $current_;
 		if($replacements['{link}'] = strtr($self ? $link_ : $link, $replacements))
 			if($custom) $mask['{links}'] .= $replacements['{link}'];
@@ -266,26 +274,36 @@ function etc_pagination($atts, $thing='') {
 	$outlast = $outnext = $outgap = '';
 	$replacements['{current}'] = $current_;
 	if($loopEnd < $numberOfTabs && $range > 1 || isset($last)) {
-		if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$numberOfTabs-1].'::'.$pages[$numberOfTabs-1]);
-		else {$replacements['{*}'] = $pages[$numberOfTabs-1]; $replacements['{#}'] = $links[$numberOfTabs-1];}
-		$replacements['{$}'] = $numberOfTabs;
-//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
-		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-		$replacements['{rel}'] = '';
+		etc_pagination_link($replacements, $links, $pages, $numberOfTabs, $pgdefault, $pagebase, $pageurl, $fragment, '', $cpages>1);
 		$replacements['{link}'] = $mask['{last}'] = strtr(isset($last) ? ($page < $numberOfTabs ? $last : $last_) : $link, $replacements);
-		if($gap2 && $loopEnd < $numberOfTabs)
-			if($custom) $mask['{+>}'] = $gap2; else $outgap = $gap2;
 		if(!$custom && $replacements['{link}']) $outlast = strtr($thing, $replacements);
+		if($gap2 && $loopEnd < $numberOfTabs) {
+//			if($custom) $mask['{+>}'] = $gap2; else $outgap = $gap2;
+			$i = $loopEnd+$range+1-$skip1;
+			if($scale > 1) {
+				$n = pow($scale, floor(log($numberOfTabs, $scale)));
+				$nt = ceil($numberOfTabs/$n)*$n;
+				if($nt >= $scale + $i - 1) {
+					$n = pow($scale, min(floor(log($nt - $i + 1, $scale)), ceil(log($i, $scale))));
+					do {
+						$j = intval($nt - floor(($nt - $i + 1)/$n)*$n);
+						$n /= $scale;
+					} while($j >= $numberOfTabs && $n >= 1);
+					$i = $j;
+				}
+			}
+			$i = min($range ? $numberOfTabs-1 : $numberOfTabs, $i);
+
+			etc_pagination_link($replacements, $links, $pages, $i, $pgdefault, $pagebase, $pageurl, $fragment, 'next', $cpages>1);
+			if($replacements['{link}'] = strtr($gap2, $replacements))
+				if($custom) $mask['{+>}'] = strtr($thing, $replacements); else $outgap = strtr($thing, $replacements);
+
+		}
 	}
 
 	if($next || $next_) {
-		if($page < $numberOfTabs) if($cpages > 1) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page].'::'.$pages[$page]);
-			else {$replacements['{*}'] = $pages[$page]; $replacements['{#}'] = $links[$page];}
-		else $replacements['{#}'] = $replacements['{*}'] = '';
-		$replacements['{$}'] = $page+1;
-//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
-		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
-		$replacements['{rel}'] = 'next';
+		etc_pagination_link($replacements, $links, $pages, $page+1, $pgdefault, $pagebase, $pageurl, $fragment, 'next', $cpages>1);
+		if($page >= $numberOfTabs) $replacements['{#}'] = $replacements['{*}'] = '';
 		$replacements['{link}'] = $mask['{next}'] = strtr($page < $numberOfTabs ? $next : $next_, $replacements);
 		if(!$custom && $replacements['{link}']) $outnext = strtr($thing, $replacements);
 	}
@@ -305,11 +323,21 @@ function etc_pagination($atts, $thing='') {
 	return parse($out);
 }
 
+function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, $pagebase, $pageurl, $fragment, $rel, $custom) {
+		if (isset($pages[$page-1])) if($custom) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page-1].'::'.$pages[$page-1]);
+			else {$replacements['{*}'] = $pages[$page-1]; $replacements['{#}'] = $links[$page-1];}
+		$replacements['{$}'] = $page;
+//		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
+		$replacements['{href}'] = ($replacements['{$}'] == $pgdefault ? $pagebase : $pageurl.$replacements['{#}']).$fragment;
+		$replacements['{rel}'] = $rel;
+}
+
+
 // -------------------------------------------------------------
 	function etc_numpages($atts)
 	{
-		global $pretext, $prefs, $thispage, $etc_pagination_total;
-		if(empty($atts) && isset($thispage)) {$etc_pagination_total = $thispage['total']; return empty($thispage['numPages']) ? 1 : $thispage['numPages'];}
+		global $pretext, $prefs, $thispage, $etc_pagination, $etc_pagination_total;
+		if(empty($atts) && isset($thispage)) {$etc_pagination_total = $etc_pagination['total'] = $thispage['total']; return empty($thispage['numPages']) ? 1 : $thispage['numPages'];}
 		extract($pretext);
 		if(empty($atts['table']) && !isset($atts['total'])) {
 			$customFields = getCustomFields();
@@ -339,6 +367,7 @@ function etc_pagination($atts, $thing='') {
 		)+$customlAtts, $atts));
 
 		if(!($pageby = intval(empty($pageby) ? $limit : $pageby))) return 0;
+		$etc_pagination['pageby'] = $pageby;
 		if(isset($total)) return ceil(intval($total)/$pageby);
 
 		$where = array("1");
@@ -364,7 +393,7 @@ function etc_pagination($atts, $thing='') {
 					$where[] = "Posted > now()"; break;
 			}
 			if (!$expired) {
-				$where[] = "(now() <= Expires or Expires = ".NULLDATETIME.")";
+				$where[] = "(now() <= Expires or Expires IS NULL)";
 			}
 			//Allow keywords for no-custom articles. That tagging mode, you know
 			if ($keywords) {
@@ -395,24 +424,25 @@ function etc_pagination($atts, $thing='') {
 
 		//paginate
 		$grand_total = safe_count($table ? 'txp_'.$table : 'textpattern', $where);
-		$etc_pagination_total = $grand_total - $offset;
-		return ceil($etc_pagination_total/$pageby);
+		$etc_pagination_total = $etc_pagination['total'] = $grand_total - $offset;
+		return ceil($etc_pagination['total']/$pageby);
 	}
 
 	function etc_offset($atts)
 	{
+		global $etc_pagination;
 		//getting attributes
-		extract(lAtts(array(
+		extract(lAtts((empty($etc_pagination) ? array() : $etc_pagination) + array(
 			'type'        => '',
 			'pageby'        => '10',
 			'pgcounter'        => 'pg',
 			'offset'        => '0'
 		), $atts));
 
-		global $etc_pagination_total;
-		$counter = urldecode(gps($pgcounter));
+		if(!empty($etc_pagination)) extract($etc_pagination);
+		$counter = isset($page) ? $page : urldecode(gps($pgcounter));
 		$page = max(intval($counter), 1) + $offset;
-		$max = isset($etc_pagination_total) ? $etc_pagination_total : $page*$pageby;
+		$max = isset($total) ? $total : $page*$pageby;
 		switch($type) {
 			case 'value' : return htmlspecialchars($counter, ENT_QUOTES);
 			case 'page' : return $page;
@@ -440,19 +470,17 @@ Download the latest version of the plugin from "the GitHub project page":https:/
 
 To uninstall, delete from the Admin → Plugins panel.
 
+h2. Usage
+
+TODO
+
 h2. Tags
 
 h3. txp:etc_pagination
 
-bc(language-markup). <txp:etc_pagination />
+bc. <txp:etc_pagination />
 
-The *etc_pagination* tag is a _single_ or a _container_ tag that renders the pagination widget HTML structure.
-
-If used as a container, it must be specified as an opening and closing pair of tags, like this:
-
-bc. <txp:etc_pagination>
-    ...contained statements...
-</txp:etc_pagination>
+TODO
 
 h4. Attributes
 
@@ -476,6 +504,7 @@ h4. Attributes
 * @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
 * @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
 * @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
+* @scale="1"@<br />An integer to be used as grid for 'gap' links.
 * @wraptag="element"@<br />HTML element to wrap (markup) block, specified without brackets (e.g., @wraptag="ul"@).
 
 h4. Replacements
@@ -493,7 +522,7 @@ If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as c
 
 For example, the following will generate a <code>select</code> pagination list:
 
-bc(language-markup). <txp:etc_pagination link="Page {*}" current="selected"
+bc. <txp:etc_pagination link="Page {*}" current="selected"
     wraptag="select" atts="name='pg'">
     <option value='{*}' {current}>{link}</option>
 </txp:etc_pagination>
@@ -502,11 +531,11 @@ h4. Examples
 
 h5. Example 1
 
-bc(language-markup). <txp:etc_pagination range="2" prev="Previous" next="Next"  wraptag="ul" break="li" />
+bc. <txp:etc_pagination range="2" prev="Previous" next="Next"  wraptag="ul" break="li" />
 
 This outputs if there are ten pages and we are on the third one, like so:
 
-bc(language-markup). <ul>
+bc. <ul>
     <li>
         <a href="http://example.com/blog/&pg=1" rel="prev">Previous</a>
     </li>
@@ -534,90 +563,17 @@ The @<a>@ and @<span>@ tags linking to @first@, @prev@, @current@, @next@, @last
 
 h5. Example 2
 
-bc(language-markup). <txp:etc_pagination range="0">
+bc. <txp:etc_pagination range="0">
     <p>Page {*} of {pages}</p>
 </txp:etc_pagination>
 
 This outputs if there are ten pages and we are on the third one, like so:
 
-bc(language-markup). <p>Page 3 of 10</p>
+bc. <p>Page 3 of 10</p>
 
 h5. Example 3
 
-bc(language-markup). <txp:etc_pagination wraptag="nav" class="paginator" range="3" atts='aria-label="Blog navigation"'
-    prev='<a class="prev" rel="prev" href="http://example.com{href}" title="Go to previous page" aria-label="Go to previous page">Prev</a>,
-          <span class="prev disabled" aria-label="This is the first page">Prev</span>'
-    next='<a class="next" rel="next" href="http://example.com{href}" title="Go to next page" aria-label="Go to next page">Next</a>,
-          <span class="next disabled" aria-label="This is the last page">Next</span>'
-    link='<li><a href="http://example.com{href}" title="Go to page {*}" aria-label="Go to page {*}">{*}</a></li>,
-          <li class="current"><b title="Current page" aria-label="Current page">{*}</b></li>'
-    gap='<li><span title="More pages" aria-label="More pages">…</span></li>'
-    mask='{prev}{next}
-    <ul class="pagination">
-        {first}{<+}{links}{+>}{last}
-    </ul>'
-    />
-
-Fully customised HTML solutions can be achieved - this example outputs, if there are eleven pages and we are on the fifth one, like so:
-
-bc(language-markup). <nav class="paginator" aria-label="Blog navigation">
-    <a class="prev" rel="prev" href="http://example.com/blog/?pg=4" title="Go to previous page" aria-label="Go to previous page">Prev</a>
-    <a class="next" rel="next" href="http://example.com/blog/?pg=6" title="Go to next page" aria-label="Go to next page">Next</a>
-    <ul class="pagination">
-        <li>
-            <a href="http://example.com/blog/" title="Go to page 1" aria-label="Go to page 1">1</a>
-        </li>
-        <li>
-            <span title="More pages" aria-label="More pages">…</span>
-        </li>
-        <li>
-            <a href="http://example.com/blog/?pg=4" title="Go to page 4" aria-label="Go to page 4">4</a>
-        </li>
-        <li class="current">
-            <b title="Current page" aria-label="Current page">5</b>
-        </li>
-        <li>
-            <a href="http://example.com/blog/?pg=6" title="Go to page 6" aria-label="Go to page 6">6</a>
-        </li>
-        <li>
-            <span title="More pages" aria-label="More pages">…</span>
-        </li>
-        <li>
-            <a href="http://example.com/blog/?pg=11" title="Go to page 11" aria-label="Go to page 11">11</a>
-        </li>
-    </ul>
-</nav>
-
-h3. etc_numpages tag
-
-bc(language-markup). <txp:etc_numpages />
-
-The *etc_numpages* tag is a _single_ helper tag that counts the number of pages in various lists (articles, images, links, ...).
-
-This tag is typically used as a *pages* attribute value, passed to *etc_pagination*, like this:
-
-bc(language-markup). <txp:etc_pagination pages='<txp:numpages section="example" />' />
-
-h4. Attributes
-
-Most attributes come from @<txp:article />@ and other Textpattern list tags:
-
-* @limit="10"@<br />The default value of *pageby*, see below.
-* @offset="0"@<br />The number of items to exclude from the beginning of the list.
-* @pageby="number"@<br />The maximum number of items per page.
-* @table="txp_table"@<br />A name of Textpattern database table from which the list will be extracted. Default: @textpattern@ (articles).
-* @total="number"@<br />An optional list length, if known.
-* @author@, @category@, @excerpted@, @exclude@, @expired@, @id@, @include@, @keywords@, @month@, @realname@, @section@, @status@, @time@<br />These attributes have the same function as in "txp:article_custom":http://www.textpattern.net/wiki/index.php?title=article_custom and other "list tags":http://www.textpattern.net/wiki/index.php?title=Category:List_Tags.
-
-h4. Examples
-
-h5. Example 1
-
-bc(language-markup). <txp:if_individual_article>
-    <txp:etc_pagination pgcounter="page" pages='<txp:etc_numpages section="news" />' />
-</txp:if_individual_article>
-
-This example shows pagination on individual article pages within the @news@ section (i.e., *not* on an article list context page).
+TODO
 
 h2. History
 
