@@ -79,7 +79,7 @@ if (!defined('txpinterface'))
 	;
 
 if (@txpinterface == 'public') {
-	register_callback('etc_pagination_url', 'pretext'); 
+	register_callback('etc_pagination_url', 'pretext');
 }
 
 function etc_pagination_url($event, $step) {
@@ -346,24 +346,24 @@ function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, 
 
 		//getting attributes
 		extract(lAtts(array(
-			'table'         => '',
-			'total'         => null,
-			'limit'         => 10,
-			'pageby'        => '',
-			'category'      => '',
-			'section'       => '',
-			'exclude'       => '',
-			'include'       => '',
-			'excerpted'     => '',
-			'author'        => '',
-			'realname'       => '',
-			'month'         => '',
-			'keywords'      => '',
-			'expired'       => $prefs['publish_expired_articles'],
-			'id'            => '',
-			'time'          => 'past',
-			'status'        => '4',
-			'offset'        => 0
+			'table'     => '',
+			'total'     => null,
+			'limit'     => 10,
+			'pageby'    => '',
+			'category'  => '',
+			'section'   => '',
+			'exclude'   => '',
+			'include'   => '',
+			'excerpted' => '',
+			'author'    => '',
+			'realname'  => '',
+			'month'     => '',
+			'keywords'  => '',
+			'expired'   => $prefs['publish_expired_articles'],
+			'id'        => '',
+			'time'      => 'past',
+			'status'    => '4',
+			'offset'    => 0
 		)+$customlAtts, $atts));
 
 		if(!($pageby = intval(empty($pageby) ? $limit : $pageby))) return 0;
@@ -433,10 +433,10 @@ function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, 
 		global $etc_pagination;
 		//getting attributes
 		extract(lAtts((empty($etc_pagination) ? array() : $etc_pagination) + array(
-			'type'        => '',
-			'pageby'        => '10',
-			'pgcounter'        => 'pg',
-			'offset'        => '0'
+			'type'      => '',
+			'pageby'    => '10',
+			'pgcounter' => 'pg',
+			'offset'    => '0'
 		), $atts));
 
 		if(!empty($etc_pagination)) extract($etc_pagination);
@@ -470,17 +470,19 @@ Download the latest version of the plugin from "the GitHub project page":https:/
 
 To uninstall, delete from the Admin → Plugins panel.
 
-h2. Usage
-
-TODO
-
 h2. Tags
 
-h3. txp:etc_pagination
+h3. etc_pagination tag
 
 bc. <txp:etc_pagination />
 
-TODO
+The *etc_pagination* tag is a _single_ or a _container_ tag that renders the pagination widget HTML structure.
+
+If used as a container, it must be specified as an opening and closing pair of tags, like this:
+
+bc. <txp:etc_pagination>
+    ...contained statements...
+</txp:etc_pagination>
 
 h4. Attributes
 
@@ -498,21 +500,20 @@ h4. Attributes
 * @next="text"@<br />Enables you to alter the text inside the 'next' link.
 * @offset="number"@<br />Page number offset. Default: @0@.
 * @page="number"@<br />An integer to be considered as @default@ page (typically @1@).
-* @pages="value"@<br />The total number of pages, or a range @start..end@, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
+* @pages="value"@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
 * @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
 * @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
+* @query="a&b=c"@<br />A @&@-separated list of GET parameters to be unset/modified in @root@.
 * @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
 * @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
 * @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
-* @scale="1"@<br />An integer to be used as grid for 'gap' links.
 * @wraptag="element"@<br />HTML element to wrap (markup) block, specified without brackets (e.g., @wraptag="ul"@).
 
 h4. Replacements
 
 If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as container to construct your own links. The following replacement tokens are available inside @etc_pagination@:
 
-* @{$}@<br />The absolute page number.
-* @{#}@<br />The displayed page number.
+* @{#}@<br />The page number.
 * @{*}@<br />The page title.
 * @{current}@<br />The text given by @current@ attribute, enabled only on the current tab.
 * @{href}@<br />The page URL.
@@ -520,12 +521,11 @@ If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as c
 * @{pages}@<br />The total pages number.
 * @{rel}@<br />The page relation (@next@, @prev@).
 
-For example, the following will generate a <code>select</code> pagination list:
+For example, the following (container tag) will generate a @<select>@ pagination list:
 
-bc. <txp:etc_pagination link="Page {*}" current="selected"
-    wraptag="select" atts="name='pg'">
-    <option value='{*}' {current}>{link}</option>
-</txp:etc_pagination>
+bc. <txp:etc_pagination link="Page {*}" current="selected" wraptag="select" atts='name="pg"'>
+    <option value="{*}" {current}>{link}</option>
+</txp:etc_pagination
 
 h4. Examples
 
@@ -533,17 +533,17 @@ h5. Example 1
 
 bc. <txp:etc_pagination range="2" prev="Previous" next="Next"  wraptag="ul" break="li" />
 
-This outputs if there are ten pages and we are on the third one, like so:
+This example outputs, if there are ten pages and we are on the third one, like so:
 
 bc. <ul>
     <li>
-        <a href="http://example.com/blog/&pg=1" rel="prev">Previous</a>
+        <a href="https://example.com/blog/?pg=2" rel="prev">Previous</a>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=1">1</a>
+        <a href="https://example.com/blog/">1</a>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=2">2</a>
+        <a href="https://example.com/blog/?pg=2">2</a>
     </li>
     <li>
         <span data-rel="current">3</span>
@@ -552,10 +552,10 @@ bc. <ul>
         <span data-rel="gap">…</span>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=10" rel="last">10</a>
+        <a href="https://example.com/blog/?pg=10">10</a>
     </li>
     <li>
-        <a href="http://example.com/blog/&pg=5" rel="next">Next</a>
+        <a href="https://example.com/blog/?pg=4" rel="next">Next</a>
     </li>
 </ul>
 
@@ -567,17 +567,90 @@ bc. <txp:etc_pagination range="0">
     <p>Page {*} of {pages}</p>
 </txp:etc_pagination>
 
-This outputs if there are ten pages and we are on the third one, like so:
+This example outputs, if there are eight pages and we are on the sixth one, like so:
 
-bc. <p>Page 3 of 10</p>
+bc. <p>Page 6 of 8</p>
 
 h5. Example 3
 
+bc. <txp:etc_pagination wraptag="nav" class="paginator" range="3" atts='aria-label="Blog navigation"'
+    prev='<a class="prev" rel="prev" href="https://example.com{href}" title="Go to previous page" aria-label="Go to previous page">Prev</a>,
+          <span class="prev disabled" aria-label="This is the first page">Prev</span>'
+    next='<a class="next" rel="next" href="https://example.com{href}" title="Go to next page" aria-label="Go to next page">Next</a>,
+          <span class="next disabled" aria-label="This is the last page">Next</span>'
+    link='<li><a href="https://example.com{href}" title="Go to page {*}" aria-label="Go to page {*}">{*}</a></li>,
+          <li class="current"><b title="Current page" aria-label="Current page">{*}</b></li>'
+    gap='<li><span title="More pages" aria-label="More pages">…</span></li>'
+    mask='{prev}{next}
+    <ul class="pagination">
+        {first}{<+}{links}{+>}{last}
+    </ul>'
+    />
+
+Fully customised HTML solutions can be achieved - this example outputs, if there are eleven pages and we are on the fifth one, like so:
+
+bc. <nav class="paginator" aria-label="Blog navigation">
+    <a class="prev" rel="prev" href="https://example.com/blog/?pg=4" title="Go to previous page" aria-label="Go to previous page">Prev</a>
+    <a class="next" rel="next" href="https://example.com/blog/?pg=6" title="Go to next page" aria-label="Go to next page">Next</a>
+    <ul class="pagination">
+        <li>
+            <a href="https://example.com/blog/" title="Go to page 1" aria-label="Go to page 1">1</a>
+        </li>
+        <li>
+            <span title="More pages" aria-label="More pages">…</span>
+        </li>
+        <li>
+            <a href="https://example.com/blog/?pg=4" title="Go to page 4" aria-label="Go to page 4">4</a>
+        </li>
+        <li class="current">
+            <b title="Current page" aria-label="Current page">5</b>
+        </li>
+        <li>
+            <a href="https://example.com/blog/?pg=6" title="Go to page 6" aria-label="Go to page 6">6</a>
+        </li>
+        <li>
+            <span title="More pages" aria-label="More pages">…</span>
+        </li>
+        <li>
+            <a href="https://example.com/blog/?pg=11" title="Go to page 11" aria-label="Go to page 11">11</a>
+        </li>
+    </ul>
+</nav>
+
+h3. etc_numpages tag
+
+bc. <txp:etc_numpages />
+
+The *etc_numpages* tag is a _single_ helper tag that counts the number of pages in various lists (articles, images, links, ...).
+
+This tag is typically used as a *pages* attribute value, passed to *etc_pagination*, like this:
+
+bc. <txp:etc_pagination pages='<txp:numpages section="example" />' />
+
+h4. Attributes
+
+Most attributes come from @<txp:article />@ and other Textpattern list tags:
+
+* @limit="10"@<br />The default value of *pageby*, see below.
+* @offset="0"@<br />The number of items to exclude from the beginning of the list.
+* @pageby="number"@<br />The maximum number of items per page.
+* @table="txp_table"@<br />A name of Textpattern database table from which the list will be extracted. Default: @textpattern@ (articles).
+* @total="number"@<br />An optional list length, if known.
+* @author@, @category@, @excerpted@, @exclude@, @expired@, @id@, @include@, @keywords@, @month@, @realname@, @section@, @status@, @time@<br />These attributes have the same function as in "txp:article_custom":http://www.textpattern.net/wiki/index.php?title=article_custom and other "list tags":http://www.textpattern.net/wiki/index.php?title=Category:List_Tags.
+
+h4. Examples
+
+h5. Example 1
+
+bc. <txp:if_individual_article>
+    <txp:etc_pagination pgcounter="page" pages='<txp:etc_numpages section="news" />' />
+</txp:if_individual_article>
+
+This example shows pagination on individual article pages within the @news@ section (i.e., *not* on an article list context page).
+
+h3. etc_offset tag
+
 TODO
-
-h2. History
-
-Please see the "changelog on GitHub":https://github.com/bloatware/etc-pagination/blob/master/CHANGELOG.textile.
 
 h2. Authors/credits
 
