@@ -1,0 +1,16 @@
+{
+  "name": "bloatware/etc-pagination",
+  "description": "Pagination plugin for Textpattern CMS",
+  "keywords": ["textpattern", "plugin", "pagination"],
+  "homepage": "https://github.com/bloatware/etc-pagination",
+  "license": "GPL-2.0",
+  "type": "textpattern-plugin",
+  "support": {
+    "issues": "https://github.com/bloatware/etc-pagination/issues",
+    "source": "https://github.com/bloatware/etc-pagination"
+  },
+  "require": {
+    "textpattern/lock": "4.5.*,4.6.*",
+    "textpattern/installer": "*"
+  }
+}
