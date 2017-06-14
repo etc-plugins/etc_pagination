@@ -10,7 +10,7 @@
     "source": "https://github.com/bloatware/etc-pagination"
   },
   "require": {
-    "textpattern/lock": "4.5.*,4.6.*",
+    "textpattern/lock": ">=4.5.0",
     "textpattern/installer": "*"
   }
 }
