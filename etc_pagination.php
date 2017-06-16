@@ -71,7 +71,7 @@ if (!defined('txpinterface'))
         @include_once('zem_tpl.php');
 
 # --- BEGIN PLUGIN CODE ---
- // TXP 4.6 tag registration
+// TXP 4.6 tag registration
 	if(class_exists('\Textpattern\Tag\Registry')) Txp::get('\Textpattern\Tag\Registry')
 		->register('etc_pagination')
 		->register('etc_numpages')
@@ -79,7 +79,7 @@ if (!defined('txpinterface'))
 	;
 
 if (@txpinterface == 'public') {
-	register_callback('etc_pagination_url', 'pretext'); 
+	register_callback('etc_pagination_url', 'pretext');
 }
 
 function etc_pagination_url($event, $step) {
@@ -349,24 +349,24 @@ function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, 
 
 		//getting attributes
 		extract(lAtts(array(
-			'table'         => '',
-			'total'         => null,
-			'limit'         => 10,
-			'pageby'        => '',
-			'category'      => '',
-			'section'       => '',
-			'exclude'       => '',
-			'include'       => '',
-			'excerpted'     => '',
-			'author'        => '',
-			'realname'       => '',
-			'month'         => '',
-			'keywords'      => '',
-			'expired'       => $prefs['publish_expired_articles'],
-			'id'            => '',
-			'time'          => 'past',
-			'status'        => '4',
-			'offset'        => 0
+			'table'     => '',
+			'total'     => null,
+			'limit'     => 10,
+			'pageby'    => '',
+			'category'  => '',
+			'section'   => '',
+			'exclude'   => '',
+			'include'   => '',
+			'excerpted' => '',
+			'author'    => '',
+			'realname'  => '',
+			'month'     => '',
+			'keywords'  => '',
+			'expired'   => $prefs['publish_expired_articles'],
+			'id'        => '',
+			'time'      => 'past',
+			'status'    => '4',
+			'offset'    => 0
 		)+$customlAtts, $atts));
 
 		if(!($pageby = intval(empty($pageby) ? $limit : $pageby))) return 0;
@@ -436,10 +436,10 @@ function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, 
 		global $etc_pagination;
 		//getting attributes
 		extract(lAtts((empty($etc_pagination) ? array() : $etc_pagination) + array(
-			'type'        => '',
-			'pageby'        => '10',
-			'pgcounter'        => 'pg',
-			'offset'        => '0'
+			'type'      => '',
+			'pageby'    => '10',
+			'pgcounter' => 'pg',
+			'offset'    => '0'
 		), $atts));
 
 		if(!empty($etc_pagination)) extract($etc_pagination);
@@ -469,9 +469,9 @@ p(alert-block information). Note that this plugin creates a list that is meant t
 
 h2. Installation, upgrading and uninstallation
 
-Download the latest version of the plugin from "the GitHub project page":https://github.com/bloatware/etc-pagination/releases, paste the code into the Textpattern Admin â†’ Plugins panel, install and enable the plugin. Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
+Download the latest version of the plugin from "the GitHub project page":https://github.com/bloatware/etc-pagination/releases, paste the code into the Textpattern Plugins administration panel, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.io/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
 
-To uninstall, delete from the Admin → Plugins panel.
+To uninstall, delete from the Textpattern Plugins administration panel.
 
 h2. Tags
 
@@ -495,7 +495,7 @@ h4. Attributes
 * @current="text"@<br />A text active on the current tab.
 * @delimiter="value"@<br />A string to use as delimiter in @general,current@ link pairs, see below. Default: @,@ (a comma).
 * @first="text"@<br />Enables you to alter the text inside the 'first' link.
-* @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @â€¦@.
+* @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
 * @html_id="id"@<br />The HTML @id@ attribute assigned to the @wraptag@ attribute value.
 * @last="text"@<br />Enables you to alter the text inside the 'last' link.
 * @link="text"@<br />Enables you to alter the text in the titles of the page tabs. If two *delimiter*-separated strings are given, then the first one will be used on @general@ pages, and the second one on the @current@ page. Default: @{*}@, where @{*}@ will be replaced by appropriate tab numbers, see 'Replacements' section below.
@@ -507,7 +507,7 @@ h4. Attributes
 * @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
 * @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
 * @query="a&b=c"@<br />A @&@-separated list of GET parameters to be unset/modified in @root@.
-* @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 â€¦ 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
+* @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
 * @reversenumberorder="number"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3,...@, setting value to @1@ reverses the link numbers, @2@ reverses theirs hrefs, and @3@ reverses both numbers and hrefs.
 * @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
 * @scale="1"@<br />An integer to be used as grid for 'gap' links.
