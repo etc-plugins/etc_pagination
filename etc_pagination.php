@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_pagination';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.4.6';
+$plugin['version'] = '0.4.7b';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'http://www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Google-style pagination';
@@ -71,7 +71,7 @@ if (!defined('txpinterface'))
         @include_once('zem_tpl.php');
 
 # --- BEGIN PLUGIN CODE ---
-// TXP 4.6 tag registration
+ // TXP 4.6 tag registration
 	if(class_exists('\Textpattern\Tag\Registry')) Txp::get('\Textpattern\Tag\Registry')
 		->register('etc_pagination')
 		->register('etc_numpages')
@@ -79,7 +79,7 @@ if (!defined('txpinterface'))
 	;
 
 if (@txpinterface == 'public') {
-	register_callback('etc_pagination_url', 'pretext');
+	register_callback('etc_pagination_url', 'pretext'); 
 }
 
 function etc_pagination_url($event, $step) {
@@ -114,7 +114,7 @@ function etc_pagination($atts, $thing='') {
 		"class"=>'',
 		"html_id"=>'',
 		"atts"=>'',
-		"reversenumberorder"=>'0'
+		"reversenumberorder"=>0
 	),$atts));
 
 	$etc_pagination['pgcounter'] = $pgcounter;
@@ -136,12 +136,15 @@ function etc_pagination($atts, $thing='') {
 		$pages = range(1, $numberOfTabs);
 	}
 
-	if($numberOfTabs <= 1) return parse(EvalElse($thing, 0));
+	if($numberOfTabs <= 1) return parse(EvalElse($thing, false));
 
 	# if we got tabs, start the outputting
+	$reversenumberorder = (int)$reversenumberorder;
 	if(isset($links)) $links = array_pad(do_list($links, $delimiter), $numberOfTabs, '');
-	elseif($cpages < 2)
-		if($reversenumberorder) $links = array_reverse($pages); else $links = &$pages;
+	elseif($cpages < 2) switch($reversenumberorder) {
+		case 1 : case 2 : $links = array_reverse($pages); break;
+		default : $links = &$pages;
+	}
 	else $links = array();
 
 	$range = (int) $range;
@@ -177,7 +180,7 @@ function etc_pagination($atts, $thing='') {
 			if(($pgdefault = array_search($page, $pages)) !== false) $pgdefault++;
 			else $pgdefault = 0;
 		else for($pgdefault = $numberOfTabs; $pgdefault > 0 && strpos($pages[$pgdefault-1].'::', $page.'::') !== 0; $pgdefault--);
-	else $pgdefault = $reversenumberorder ? $numberOfTabs : 1;
+	else $pgdefault = $reversenumberorder & 1 ? $numberOfTabs : 1;
 	if(isset($parts[$pgcounter]))
 		if($cpages < 2)
 			if(($page = array_search($parts[$pgcounter], $links)) !== false) $page++;
@@ -186,7 +189,7 @@ function etc_pagination($atts, $thing='') {
 	else $page = $pgdefault;
 	$etc_pagination['page'] = $page;
 	$page += $offset;
-//	if($page < 1 || $page > $numberOfTabs) return parse(EvalElse($thing, 0));
+	if($page < 1 || $page > $numberOfTabs) return parse(EvalElse($thing, 0));
 
 	unset($parts[$pgcounter]);
 	$qs = array();//join_qs($parts);
@@ -251,7 +254,7 @@ function etc_pagination($atts, $thing='') {
 			$i = max($range ? 2 : 1, $i);
 			etc_pagination_link($replacements, $links, $pages, $i, $pgdefault, $pagebase, $pageurl, $fragment, 'prev', $cpages>1);
 			if($replacements['{link}'] = strtr($gap1, $replacements))
-				if($custom) $mask['{<+}'] .= strtr($thing, $replacements); else $outgap = strtr($thing, $replacements);
+				if($custom) $mask['{<+}'] = $replacements['{link}']; else $outgap = strtr($thing, $replacements);
 		}
 	}
 
@@ -296,7 +299,7 @@ function etc_pagination($atts, $thing='') {
 
 			etc_pagination_link($replacements, $links, $pages, $i, $pgdefault, $pagebase, $pageurl, $fragment, 'next', $cpages>1);
 			if($replacements['{link}'] = strtr($gap2, $replacements))
-				if($custom) $mask['{+>}'] = strtr($thing, $replacements); else $outgap = strtr($thing, $replacements);
+				if($custom) $mask['{+>}'] = $replacements['{link}']; else $outgap = strtr($thing, $replacements);
 
 		}
 	}
@@ -317,7 +320,7 @@ function etc_pagination($atts, $thing='') {
 
 	if($atts) $atts = ' '.$atts;
 	if($custom) $out = array(strtr($thing, $mask));
-	if($reversenumberorder) $out = array_reverse($out);
+	if($reversenumberorder & 1) $out = array_reverse($out);
 	$out = doWrap($out, $wraptag, $break, $class, '', $atts, '', $html_id);
 	if($currentclass > 0) $out = str_replace(array("<$break>{current}", "<$break>{current_}"), array("<{$break}{$current}>", "<{$break}{$current_}>"), $out);
 	return parse($out);
@@ -346,24 +349,24 @@ function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, 
 
 		//getting attributes
 		extract(lAtts(array(
-			'table'     => '',
-			'total'     => null,
-			'limit'     => 10,
-			'pageby'    => '',
-			'category'  => '',
-			'section'   => '',
-			'exclude'   => '',
-			'include'   => '',
-			'excerpted' => '',
-			'author'    => '',
-			'realname'  => '',
-			'month'     => '',
-			'keywords'  => '',
-			'expired'   => $prefs['publish_expired_articles'],
-			'id'        => '',
-			'time'      => 'past',
-			'status'    => '4',
-			'offset'    => 0
+			'table'         => '',
+			'total'         => null,
+			'limit'         => 10,
+			'pageby'        => '',
+			'category'      => '',
+			'section'       => '',
+			'exclude'       => '',
+			'include'       => '',
+			'excerpted'     => '',
+			'author'        => '',
+			'realname'       => '',
+			'month'         => '',
+			'keywords'      => '',
+			'expired'       => $prefs['publish_expired_articles'],
+			'id'            => '',
+			'time'          => 'past',
+			'status'        => '4',
+			'offset'        => 0
 		)+$customlAtts, $atts));
 
 		if(!($pageby = intval(empty($pageby) ? $limit : $pageby))) return 0;
@@ -433,10 +436,10 @@ function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, 
 		global $etc_pagination;
 		//getting attributes
 		extract(lAtts((empty($etc_pagination) ? array() : $etc_pagination) + array(
-			'type'      => '',
-			'pageby'    => '10',
-			'pgcounter' => 'pg',
-			'offset'    => '0'
+			'type'        => '',
+			'pageby'        => '10',
+			'pgcounter'        => 'pg',
+			'offset'        => '0'
 		), $atts));
 
 		if(!empty($etc_pagination)) extract($etc_pagination);
@@ -466,7 +469,7 @@ p(alert-block information). Note that this plugin creates a list that is meant t
 
 h2. Installation, upgrading and uninstallation
 
-Download the latest version of the plugin from "the GitHub project page":https://github.com/bloatware/etc-pagination/releases, paste the code into the Textpattern Admin → Plugins panel, install and enable the plugin. Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
+Download the latest version of the plugin from "the GitHub project page":https://github.com/bloatware/etc-pagination/releases, paste the code into the Textpattern Admin â†’ Plugins panel, install and enable the plugin. Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
 
 To uninstall, delete from the Admin → Plugins panel.
 
@@ -492,7 +495,7 @@ h4. Attributes
 * @current="text"@<br />A text active on the current tab.
 * @delimiter="value"@<br />A string to use as delimiter in @general,current@ link pairs, see below. Default: @,@ (a comma).
 * @first="text"@<br />Enables you to alter the text inside the 'first' link.
-* @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @…@.
+* @gap="text"@<br />One or two *delimiter*-separated symbols that state that there are more tabs before or after the ones currently viewable. Default: @â€¦@.
 * @html_id="id"@<br />The HTML @id@ attribute assigned to the @wraptag@ attribute value.
 * @last="text"@<br />Enables you to alter the text inside the 'last' link.
 * @link="text"@<br />Enables you to alter the text in the titles of the page tabs. If two *delimiter*-separated strings are given, then the first one will be used on @general@ pages, and the second one on the @current@ page. Default: @{*}@, where @{*}@ will be replaced by appropriate tab numbers, see 'Replacements' section below.
@@ -500,20 +503,22 @@ h4. Attributes
 * @next="text"@<br />Enables you to alter the text inside the 'next' link.
 * @offset="number"@<br />Page number offset. Default: @0@.
 * @page="number"@<br />An integer to be considered as @default@ page (typically @1@).
-* @pages="value"@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
+* @pages="value"@<br />The total number of pages, or a range @start..end@, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
 * @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
 * @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
 * @query="a&b=c"@<br />A @&@-separated list of GET parameters to be unset/modified in @root@.
-* @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
-* @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
+* @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 â€¦ 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
+* @reversenumberorder="number"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3,...@, setting value to @1@ reverses the link numbers, @2@ reverses theirs hrefs, and @3@ reverses both numbers and hrefs.
 * @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
+* @scale="1"@<br />An integer to be used as grid for 'gap' links.
 * @wraptag="element"@<br />HTML element to wrap (markup) block, specified without brackets (e.g., @wraptag="ul"@).
 
 h4. Replacements
 
 If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as container to construct your own links. The following replacement tokens are available inside @etc_pagination@:
 
-* @{#}@<br />The page number.
+* @{$}@<br />The absolute page number.
+* @{#}@<br />The displayed page number.
 * @{*}@<br />The page title.
 * @{current}@<br />The text given by @current@ attribute, enabled only on the current tab.
 * @{href}@<br />The page URL.
