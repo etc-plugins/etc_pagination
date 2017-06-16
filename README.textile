@@ -42,20 +42,22 @@ h4. Attributes
 * @next="text"@<br />Enables you to alter the text inside the 'next' link.
 * @offset="number"@<br />Page number offset. Default: @0@.
 * @page="number"@<br />An integer to be considered as @default@ page (typically @1@).
-* @pages="value"@<br />The total number of pages, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
+* @pages="value"@<br />The total number of pages, or a range @start..end@, or a *delimiter*-separated list of @page[::title]@ items. Not needed when paginating @<txp:article />@ tag (default value).
 * @pgcounter="value"@<br />The URL parameter to drive the navigation. Not needed when paginating @<txp:article />@ tag. Default: @pg@.
 * @prev="text"@<br />Enables you to alter the text inside the 'previous' link.
 * @query="a&b=c"@<br />A @&@-separated list of GET parameters to be unset/modified in @root@.
 * @range="number"@<br />The maximum number of left/right neighbours (including gaps) to display. If negative (default), all pages will be displayed. The plugin tries to avoid 'nonsense' gaps like @1 … 3 4@ and adjust the output so that the number of displayed tabs is @2*range+1@.
-* @reversenumberorder="boolean"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3 and so on@, setting value to @1@ renders @3,2,1 and so on@.
+* @reversenumberorder="number"@<br />Makes it possible to reverse the numbers in the tabs. Setting to value to @0@ (default) renders @1,2,3,...@, setting value to @1@ reverses the link numbers, @2@ reverses theirs hrefs, and @3@ reverses both numbers and hrefs.
 * @root="URL"@<br />The URL to be used as base for navigation, defaults to the current page URL.
+* @scale="1"@<br />An integer to be used as grid for 'gap' links.
 * @wraptag="element"@<br />HTML element to wrap (markup) block, specified without brackets (e.g., @wraptag="ul"@).
 
 h4. Replacements
 
 If you are not happy with the default @<a>@ links, use @<etc_pagination />@ as container to construct your own links. The following replacement tokens are available inside @etc_pagination@:
 
-* @{#}@<br />The page number.
+* @{$}@<br />The absolute page number.
+* @{#}@<br />The displayed page number.
 * @{*}@<br />The page title.
 * @{current}@<br />The text given by @current@ attribute, enabled only on the current tab.
 * @{href}@<br />The page URL.
