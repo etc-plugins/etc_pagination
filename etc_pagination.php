@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_pagination';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.4.7b';
+$plugin['version'] = '0.5.0-beta';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'http://www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Google-style pagination';
@@ -467,11 +467,17 @@ Please report bugs and problems with this plugin at "the GitHub project's issues
 
 p(alert-block information). Note that this plugin creates a list that is meant to be _styled by you_ using CSS.
 
-h2. Installation, upgrading and uninstallation
+h2. Installing
 
-Download the latest version of the plugin from "the GitHub project page":https://github.com/etc-plugins/etc_pagination/releases, paste the code into the Textpattern Plugins administration panel, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.io/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
+Using "Composer":https://getcomposer.org:
 
-To uninstall, delete from the Textpattern Plugins administration panel.
+bc. $ composer require etc-plugins/etc_pagination:*
+
+Or download the latest version of the plugin from "the GitHub project page":https://github.com/etc-plugins/etc_pagination/releases, paste the code into the Textpattern Plugins administration panel, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.io/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
+
+h2. Requirements
+
+* Textpattern 4.5.0 or newer.
 
 h2. Tags
 
