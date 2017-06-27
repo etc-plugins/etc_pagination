@@ -463,13 +463,13 @@ h1. etc_pagination
 
 This Textpattern plugin creates a paginated navigation bar similar to those seen on Google when you search for something. It has a wide variety of attributes - so you are able to customise it until you drop! It can be used alone for @<txp:article />@ and @<txp:article_custom />@ pagination, but it also has the ability to paginate any list, with a little help from "etc_query":http://www.iut-fbleau.fr/projet/etc/index.php?id=3.
 
-Please report bugs and problems with this plugin at "the GitHub project's issues page":https://github.com/bloatware/etc-pagination/issues.
+Please report bugs and problems with this plugin at "the GitHub project's issues page":https://github.com/etc-plugins/etc_pagination/issues.
 
 p(alert-block information). Note that this plugin creates a list that is meant to be _styled by you_ using CSS.
 
 h2. Installation, upgrading and uninstallation
 
-Download the latest version of the plugin from "the GitHub project page":https://github.com/bloatware/etc-pagination/releases, paste the code into the Textpattern Plugins administration panel, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.io/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
+Download the latest version of the plugin from "the GitHub project page":https://github.com/etc-plugins/etc_pagination/releases, paste the code into the Textpattern Plugins administration panel, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.io/viewtopic.php?id=39302 for more info or to report on the success or otherwise of the plugin.
 
 To uninstall, delete from the Textpattern Plugins administration panel.
 
@@ -659,7 +659,7 @@ TODO
 
 h2. Authors/credits
 
-Written by "Oleg Loukianov":http://www.iut-fbleau.fr/projet/etc/. Many thanks to "all additional contributors":https://github.com/bloatware/etc-pagination/graphs/contributors.
+Written by "Oleg Loukianov":http://www.iut-fbleau.fr/projet/etc/. Many thanks to "all additional contributors":https://github.com/etc-plugins/etc_pagination/graphs/contributors.
 # --- END PLUGIN HELP ---
 -->
 <?php
