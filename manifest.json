@@ -1,0 +1,11 @@
+{
+  "name": "etc_pagination",
+  "description": "Google-style pagination",
+  "version": "0.5.0-beta",
+  "type": 0,
+  "author": "Oleg Loukianov",
+  "author_uri": "http://www.iut-fbleau.fr/projet/etc/",
+  "order": 3,
+  "flags": 0,
+  "help": {"file" : ["./README.textile"]}
+}
