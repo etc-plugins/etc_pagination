@@ -202,7 +202,24 @@ This example shows pagination on individual article pages within the @news@ sect
 
 h3. etc_offset tag
 
-TODO
+bc. <txp:article_custom offset='<txp:etc_offset pgcounter="page" pageby="5" />' limit="5" />
+
+Used as helper tag to calculate the offset of article|image|... listing tags. The example above sets the offset to @15@ on a page with @...&page=4@ URL, so @<txp:article_custom />@ will display the fourth page of 5 articles.
+
+h4. Attributes
+
+* @pageby="10"@<br />The number of items per page.
+* @pgcounter="pg"@<br />The URL variable to be considered as page number.
+* @offset="0"@<br />An optional page offset.
+* @type="value|page|start|end"@<br />Outputs either the raw (escaped) *value* of @pgcounter@, or the calculated *page* number, or the *start* page item number, or the *end* page item number.
+
+h4. Examples
+
+h5. Example 1
+
+bc. Showing articles <txp:etc_offset type="start" /> to <txp:etc_offset type="end" />
+
+Outputs @Showing articles 21 to 30@ on the third page of the standard @<txp:article />@ list.
 
 h2. Authors/credits
 
