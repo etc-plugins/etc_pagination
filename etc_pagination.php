@@ -17,10 +17,10 @@ $plugin['name'] = 'etc_pagination';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.5.0-beta';
+$plugin['version'] = '0.5.0';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'http://www.iut-fbleau.fr/projet/etc/';
-$plugin['description'] = 'Google-style pagination';
+$plugin['description'] = 'Pagination navigation bars for Textpattern';
 
 // Plugin load order:
 // The default value of 5 would fit most plugins, while for instance comment
@@ -463,7 +463,7 @@ h1. etc_pagination
 
 "Download":https://github.com/etc-plugins/etc_pagination/releases | "Packagist":https://packagist.org/packages/etc-plugins/etc_pagination
 
-This Textpattern plugin creates a paginated navigation bar similar to those seen on Google when you search for something. It has a wide variety of attributes - so you are able to customise it until you drop! It can be used alone for @<txp:article />@ and @<txp:article_custom />@ pagination, but it also has the ability to paginate any list, with a little help from "etc_query":http://www.iut-fbleau.fr/projet/etc/index.php?id=3.
+This Textpattern plugin creates a paginated navigation bar. It has a wide variety of attributes - so you are able to customise it until you drop! It can be used alone for @<txp:article />@ and @<txp:article_custom />@ pagination, but it also has the ability to paginate any list, with a little help from "etc_query":http://www.iut-fbleau.fr/projet/etc/index.php?id=3.
 
 Please report bugs and problems with this plugin at "the GitHub project's issues page":https://github.com/etc-plugins/etc_pagination/issues.
 

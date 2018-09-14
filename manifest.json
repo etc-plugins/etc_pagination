@@ -1,7 +1,7 @@
 {
   "name": "etc_pagination",
-  "description": "Google-style pagination",
-  "version": "0.5.0-beta",
+  "description": "Pagination navigation bars for Textpattern",
+  "version": "0.5.0",
   "txp-type":"textpattern-plugin",
   "type": 0,
   "author": "Oleg Loukianov",
