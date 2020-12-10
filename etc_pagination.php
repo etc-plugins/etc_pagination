@@ -17,7 +17,7 @@ $plugin['name'] = 'etc_pagination';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.5.0';
+$plugin['version'] = '0.5.1';
 $plugin['author'] = 'Oleg Loukianov';
 $plugin['author_uri'] = 'http://www.iut-fbleau.fr/projet/etc/';
 $plugin['description'] = 'Pagination navigation bars for Textpattern';
@@ -164,7 +164,7 @@ function etc_pagination($atts, $thing='') {
 	}
 
 	if($query) foreach(do_list($query, '&') as $qs) {
-		@list($k, $v) = explode('=', $qs, 2);
+		list($k, $v) = explode('=', $qs, 2) + array(null, null);
 		if(!isset($v)) if($k === '?') $parts = array();
 			elseif($k === '#') $fragment = '';
 			else unset($parts[$k]);
@@ -201,10 +201,10 @@ function etc_pagination($atts, $thing='') {
 
 	$currentclass = (empty($thing) && $current && strpos($link, '{current}') === false ? ($break ? 1 : -1) : 0);
 
-	@list($gap1, $gap2) = explode($delimiter, $gap); if(!isset($gap2)) $gap2 = $gap1;
-	@list($link, $link_) = explode($delimiter, $link, 2); if(!isset($link_)) $link_ = $link;
+	list($gap1, $gap2) = explode($delimiter, $gap) + array(null, null); if(!isset($gap2)) $gap2 = $gap1;
+	list($link, $link_) = explode($delimiter, $link, 2) + array(null, null); if(!isset($link_)) $link_ = $link;
 	foreach(array('first', 'prev', 'next', 'last', 'current') as $item) if(isset($$item))
-		{@list($$item, ${$item.'_'}) = explode($delimiter, $$item, 2); if(!isset(${$item.'_'})) ${$item.'_'} = '';}
+		{list($$item, ${$item.'_'}) = explode($delimiter, $$item, 2) + array(null, null); if(!isset(${$item.'_'})) ${$item.'_'} = '';}
 	if($currentclass) {if($current) $current = " class='$current'"; if($current_) $current_ = " class='$current_'";}
 
 	$skip1 = $range < 3 ? $range : 1 + ($gap1 ? 1 : 0) + (isset($first) ? 0 : 1);
@@ -327,7 +327,7 @@ function etc_pagination($atts, $thing='') {
 }
 
 function etc_pagination_link(&$replacements, $links, $pages, $page, $pgdefault, $pagebase, $pageurl, $fragment, $rel, $custom) {
-		if (isset($pages[$page-1])) if($custom) @list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page-1].'::'.$pages[$page-1]);
+		if (isset($pages[$page-1])) if($custom) list($replacements['{#}'], $replacements['{*}']) = explode('::', $pages[$page-1].'::'.$pages[$page-1]);
 			else {$replacements['{*}'] = $pages[$page-1]; $replacements['{#}'] = $links[$page-1];}
 		$replacements['{$}'] = $page;
 //		if($reversenumberorder) $replacements['{$}'] = $numberOfTabs-$replacements['{$}']+1;
